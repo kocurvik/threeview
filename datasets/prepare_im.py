@@ -287,7 +287,7 @@ def run_im(args):
     dataset_path = Path(args.dataset_path)
     dir_list = [x for x in os.listdir(dataset_path) if os.path.isdir(os.path.join(dataset_path, x))]
 
-    for subset in dir_list[:1]:
+    for subset in dir_list:
         prepare_single(args, subset)
 
 if __name__ == '__main__':
