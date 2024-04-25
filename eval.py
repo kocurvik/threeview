@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 from multiprocessing import Pool
@@ -12,6 +13,18 @@ from tqdm import tqdm
 
 from theory.lo_verification import skew
 from utils.geometry import rotation_angle, angle
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--first', type=int, default=None)
+    parser.add_argument('-i', '--force_inliers', type=float, default=None)
+    parser.add_argument('-nw', '--num_workers', type=int, default=1)
+    parser.add_argument('feature_file')
+    parser.add_argument('dataset_path')
+
+    return parser.parse_args()
+
 
 
 def get_pose(img1, img2, R_dict, T_dict):
@@ -141,7 +154,7 @@ def add_rand_pts(x, cam_dict, multiplier):
     x_new[:, 1] *= cam_dict['height']
     return np.row_stack([x, x_new])
 
-def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts):
+def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ratio):
     F12 = get_gt_F(img1, img2, R_dict, T_dict, camera_dicts)
     F13 = get_gt_F(img1, img3, R_dict, T_dict, camera_dicts)
     F23 = get_gt_F(img2, img3, R_dict, T_dict, camera_dicts)
@@ -154,11 +167,13 @@ def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts):
 
     # print(np.sum(inliers_12), np.sum(inliers_13), np.sum(inliers_23), np.sum(l), len(x1))
 
+    multiplier = (1 - ratio) / ratio
+
     x1, x2, x3 = x1[l], x2[l], x3[l]
 
-    x1 = add_rand_pts(x1, camera_dicts[img1], 4)
-    x2 = add_rand_pts(x2, camera_dicts[img2], 4)
-    x3 = add_rand_pts(x3, camera_dicts[img3], 4)
+    x1 = add_rand_pts(x1, camera_dicts[img1], multiplier)
+    x2 = add_rand_pts(x2, camera_dicts[img2], multiplier)
+    x3 = add_rand_pts(x3, camera_dicts[img3], multiplier)
 
     return x1, x2, x3
 
@@ -213,13 +228,12 @@ def draw_results(results, experiments, iterations_list):
     plt.legend()
     plt.show()
 
-def eval(dataset_path, first=None, load=False):
+def eval(args):
+    dataset_path = args.dataset_path
     R_file = h5py.File(os.path.join(dataset_path, 'R.h5'))
     T_file = h5py.File(os.path.join(dataset_path, 'T.h5'))
-    # C_file = h5py.File(os.path.join(dataset_path, 'SIFT_triplet_correspondences.h5'))
-    # triplets = get_triplets(os.path.join(dataset_path, 'SIFT_triplet_correspondences_list.txt'))
-    C_file = h5py.File(os.path.join(dataset_path, 'triplets-features_SP_noresize_2048-LG.h5'))
-    triplets = get_triplets(os.path.join(dataset_path, 'triplets-features_SP_noresize_2048-LG.txt'))
+    C_file = h5py.File(os.path.join(dataset_path, f'{args.feature_file}.h5'))
+    triplets = get_triplets(os.path.join(dataset_path, f'{args.feature_file}.txt'))
 
     R_dict = {k: np.array(v) for k, v in R_file.items()}
     T_dict = {k: np.array(v) for k, v in T_file.items()}
@@ -234,8 +248,8 @@ def eval(dataset_path, first=None, load=False):
     iterations_list = [100, 200, 500, 1000, 2000]
     # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
 
-    if first is not None:
-        triplets = triplets[:first]
+    if args.first is not None:
+        triplets = triplets[:args.first]
 
     def gen_data():
         for triplet in triplets:
@@ -249,9 +263,11 @@ def eval(dataset_path, first=None, load=False):
             x1 = pts[l, 0:2]
             x2 = pts[l, 2:4]
             x3 = pts[l, 4:6]
-            x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts)
-            if len(x1) < 25:
-                continue
+
+            if args.force_inliers is not None:
+                x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, args.force_inliers)
+                if len(x1) < 25:
+                    continue
 
             for iterations in iterations_list:
                 for experiment in experiments:
@@ -262,19 +278,10 @@ def eval(dataset_path, first=None, load=False):
     total_length = len(experiments) * len(triplets) * len(iterations_list)
     print(f"Total runs: {total_length} for {len(triplets)} samples")
 
-    if load:
-        results = []
-        json_filenames = os.listdir('results')
-        for json_filename in json_filenames:
-            with open(os.path.join('results', json_filename), 'r') as f:
-                results.append(json.load(f))
-
-        if len(results) != total_length:
-            print(f"Loaded {len(results)} experiment results, but the expected total was {total_length}")
+    if args.num_workers == 1:
+        results = [eval_experiment(x) for x in tqdm(gen_data(), total=total_length)]
     else:
-        # results = [eval_experiment(x) for x in tqdm(gen_data(), total=total_length)]
-
-        pool = Pool(8)
+        pool = Pool(args.num_workers)
         results = [x for x in pool.imap(eval_experiment, tqdm(gen_data(), total=total_length))]
 
     print("Done")
@@ -290,5 +297,5 @@ def eval(dataset_path, first=None, load=False):
     #     json.dump(results, f, indent=4)
 
 if __name__ == '__main__':
-    dataset_path = '/mnt/d/Research/data/threeview/PhotoTourism/brandenburg_gate'
-    eval(dataset_path, first=1000)
+    args = parse_args()
+    eval(args)
