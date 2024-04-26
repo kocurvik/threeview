@@ -180,8 +180,12 @@ def create_triplets(out_dir, cameras, images, pts, args):
     with tqdm(total=args.num_samples) as pbar:
         while output < args.num_samples:
             img_ids = random.sample(list(images.keys()), 3)
-            area_1, area_2, area_3 = get_overlap_areas(cameras, images, pts, img_ids)
+            label = '-'.join([images[x].name.split('.')[0] for x in img_ids])
 
+            if label in h5_file:
+                continue
+
+            area_1, area_2, area_3 = get_overlap_areas(cameras, images, pts, img_ids)
             if area_1 > 0.1 and area_2 > 0.1 and area_3 > 0.1:
                 img_1, img_2, img_3 = (images[x] for x in img_ids)
 
@@ -227,10 +231,8 @@ def create_triplets(out_dir, cameras, images, pts, args):
                     score_23 = scores_23[idx_2]
                     out_array[i] = np.array([*point_1, *point_2, *point_3, score_12, score_13, score_23])
 
-                label = '-'.join([images[x].name.split('.')[0] for x in img_ids])
-                triplets.append(label.replace('-', ' '))
-
                 h5_file.create_dataset(label, shape=out_array.shape, data=out_array)
+                triplets.append(label.replace('-', ' '))
                 pbar.update(1)
                 output += 1
 
