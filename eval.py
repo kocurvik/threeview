@@ -20,6 +20,8 @@ def parse_args():
     parser.add_argument('-f', '--first', type=int, default=None)
     parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
+    parser.add_argument('-l', '--load', action='store_true', default=False)
+    parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('feature_file')
     parser.add_argument('dataset_path')
 
@@ -183,9 +185,15 @@ def eval_experiment(x):
     inner_refine = 100 if 'R' in experiment else 0
     delta = 0.1 if 'D' in experiment else 0.0
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                   'min_iterations': iterations,'max_iterations': iterations, 'lo_iterations': 25 if 'LO' in experiment else 0,
-                   'inner_refine': inner_refine, 'threeview_check': 'C' in experiment, 'sample_sz': num_pts, 'delta': delta}
+    if iterations is not None:
+        ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
+                       'min_iterations': iterations,'max_iterations': iterations, 'lo_iterations': 25 if 'LO' in experiment else 0,
+                       'inner_refine': inner_refine, 'threeview_check': 'C' in experiment, 'sample_sz': num_pts, 'delta': delta}
+    else:
+        ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
+                       'min_iterations': 100,'max_iterations': 10000, 'lo_iterations': 25 if 'LO' in experiment else 0,
+                       'inner_refine': inner_refine, 'threeview_check': 'C' in experiment, 'sample_sz': num_pts, 'delta': delta}
+
     bundle_dict = {'verbose': False, 'max_iterations': 100 if 'LO' in experiment else 0}
     start = perf_counter()
     three_view_pose, info = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dicts[img1], camera_dicts[img2], camera_dicts[img3], ransac_dict, bundle_dict)
@@ -230,61 +238,75 @@ def draw_results(results, experiments, iterations_list):
 
 def eval(args):
     dataset_path = args.dataset_path
-    R_file = h5py.File(os.path.join(dataset_path, 'R.h5'))
-    T_file = h5py.File(os.path.join(dataset_path, 'T.h5'))
-    C_file = h5py.File(os.path.join(dataset_path, f'{args.feature_file}.h5'))
-    triplets = get_triplets(os.path.join(dataset_path, f'{args.feature_file}.txt'))
-
-    R_dict = {k: np.array(v) for k, v in R_file.items()}
-    T_dict = {k: np.array(v) for k, v in T_file.items()}
-    camera_dicts = get_camera_dicts(os.path.join(dataset_path, 'K.h5'))
+    matches_basename = os.path.basename(args.feature_file)
+    basename = os.path.basename(dataset_path)
+    if args.graph:
+        basename = f'{basename}-graph'
+        # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
+        iterations_list = [1000, 2000, 5000, 10000, 20000]
+        # iterations_list = [100, 200, 500, 1000, 2000]
+        # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+        # iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+    else:
+        iterations_list = [None]
 
     # experiments = ['4p3v + LO', '4p3v + LO + C',  '4p3v + R + LO + C', '5p3v + LO', '5p3v + LO + C']
     # experiments = ['4p3v + LO', '4p3v + LO + D', '5p3v + LO', '4p3v + LO + C', '4p3v + LO + D + C', '5p3v + LO + C']
     experiments = ['4p3v + LO', '4p3v + LO + C', '4p3v + LO + D', '4p3v + LO + D + C', '5p3v + LO', '5p3v + LO + C']
     # experiments = ['4p3v + LO']
 
-    # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
-    iterations_list = [100, 200, 500, 1000, 2000]
-    # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+    json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
 
-    if args.first is not None:
-        triplets = triplets[:args.first]
-
-    def gen_data():
-        for triplet in triplets:
-            img1, img2, img3 = triplet
-            label = f"{img1}-{img2}-{img3}"
-
-            pts = np.array(C_file[label])
-            # we only check the first two snns to be consistent with Charalambos's eval code
-            l = np.all(pts[:, 6:8] < 0.9, axis=1)
-
-            x1 = pts[l, 0:2]
-            x2 = pts[l, 2:4]
-            x3 = pts[l, 4:6]
-
-            if args.force_inliers is not None:
-                x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, args.force_inliers)
-                if len(x1) < 25:
-                    continue
-
-            for iterations in iterations_list:
-                for experiment in experiments:
-                    # yield experiment, img1, img2, img3, x1, x2, x3, RR_dict, TT_dict, cam_dicts
-                    yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts
-
-
-    total_length = len(experiments) * len(triplets) * len(iterations_list)
-    print(f"Total runs: {total_length} for {len(triplets)} samples")
-
-    if args.num_workers == 1:
-        results = [eval_experiment(x) for x in tqdm(gen_data(), total=total_length)]
+    if args.load:
+        with open(json_path, 'r') as f:
+            results = json.load(f)
     else:
-        pool = Pool(args.num_workers)
-        results = [x for x in pool.imap(eval_experiment, tqdm(gen_data(), total=total_length))]
+        R_file = h5py.File(os.path.join(dataset_path, 'R.h5'))
+        T_file = h5py.File(os.path.join(dataset_path, 'T.h5'))
+        C_file = h5py.File(os.path.join(dataset_path, f'{args.feature_file}.h5'))
+        triplets = get_triplets(os.path.join(dataset_path, f'{args.feature_file}.txt'))
 
-    print("Done")
+        R_dict = {k: np.array(v) for k, v in R_file.items()}
+        T_dict = {k: np.array(v) for k, v in T_file.items()}
+        camera_dicts = get_camera_dicts(os.path.join(dataset_path, 'K.h5'))
+
+        if args.first is not None:
+            triplets = triplets[:args.first]
+
+        def gen_data():
+            for triplet in triplets:
+                img1, img2, img3 = triplet
+                label = f"{img1}-{img2}-{img3}"
+
+                pts = np.array(C_file[label])
+                # we only check the first two snns to be consistent with Charalambos's eval code
+                l = np.all(pts[:, 6:8] < 0.9, axis=1)
+
+                x1 = pts[l, 0:2]
+                x2 = pts[l, 2:4]
+                x3 = pts[l, 4:6]
+
+                if args.force_inliers is not None:
+                    x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, args.force_inliers)
+                    if len(x1) < 25:
+                        continue
+
+                for iterations in iterations_list:
+                    for experiment in experiments:
+                        # yield experiment, img1, img2, img3, x1, x2, x3, RR_dict, TT_dict, cam_dicts
+                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts
+
+
+        total_length = len(experiments) * len(triplets) * len(iterations_list)
+        print(f"Total runs: {total_length} for {len(triplets)} samples")
+
+        if args.num_workers == 1:
+            results = [eval_experiment(x) for x in tqdm(gen_data(), total=total_length)]
+        else:
+            pool = Pool(args.num_workers)
+            results = [x for x in pool.imap(eval_experiment, tqdm(gen_data(), total=total_length))]
+
+        print("Done")
 
     draw_results(results, experiments, iterations_list)
 
@@ -293,8 +315,8 @@ def eval(args):
         print(f'Results for: {experiment}:')
         print_results([r for r in results if r['experiment'] == experiment])
 
-    # with open('results.json', 'w') as f:
-    #     json.dump(results, f, indent=4)
+    with open(json_path, 'w') as f:
+        json.dump(results, f, indent=4)
 
 if __name__ == '__main__':
     args = parse_args()
