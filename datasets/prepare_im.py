@@ -13,6 +13,7 @@ from tqdm import tqdm
 import lightglue
 from lightglue.utils import load_image, rbd
 
+from utils.matching import LoFTRMatcher
 from utils.read_write_colmap import cam_to_K, read_model
 
 
@@ -241,6 +242,87 @@ def create_triplets(out_dir, cameras, images, pts, args):
     with open(triples_txt_path, 'w') as f:
         f.writelines(line + '\n' for line in triplets)
 
+def read_loftr_image(img_dir_path, img, cameras):
+    img_path = os.path.join(img_dir_path, img.name)
+    image_array = cv2.imread(img_path)
+    cam = cameras[img.camera_id]
+
+    if cam.width != image_array.shape[1]:
+        if cam.width == image_array.shape[0]:
+            image_array = np.swapaxes(image_array, -2, -1)
+        else:
+            print(f"Image dimensions do not comply with camera width and height for: {img_path} - skipping!")
+            return None
+    return image_array
+
+def create_triplets_loftr(out_dir, img_path, cameras, images, pts, args):
+    np.random.seed(args.seed)
+    random.seed(args.seed)
+    output = 0
+
+    matcher = LoFTRMatcher(max_dim = args.resize, device='cuda')
+    args.max_features = 0
+    h5_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.h5')
+    h5_file = h5py.File(h5_path, 'w')
+
+    triplets = []
+
+    print("Writing matches to: ", h5_path)
+
+    with tqdm(total=args.num_samples) as pbar:
+        while output < args.num_samples:
+            img_ids = random.sample(list(images.keys()), 3)
+            label = '-'.join([images[x].name.split('.')[0] for x in img_ids])
+
+            if label in h5_file:
+                continue
+
+            area_1, area_2, area_3 = get_overlap_areas(cameras, images, pts, img_ids)
+            if area_1 > 0.1 and area_2 > 0.1 and area_3 > 0.1:
+                img_1, img_2, img_3 = (images[x] for x in img_ids)
+
+                img_array_1 = read_loftr_image(img_path, img_1, cameras)
+                img_array_2 = read_loftr_image(img_path, img_2, cameras)
+                img_array_3 = read_loftr_image(img_path, img_3, cameras)
+
+                if img_array_1 is None or img_array_2 is None or img_array_3 is None:
+                    print("Noooo")
+                    continue
+
+                scores_12, kp_12_1, kp_12_2 = matcher.match(img_array_1, img_array_2)
+                scores_13, kp_13_1, kp_13_3 = matcher.match(img_array_1, img_array_3)
+
+
+                idxs = []
+
+                for idx_12, kp in enumerate(kp_12_1):
+                    idx_13 = np.where(np.all(kp_13_1==kp, axis=1))[0]
+
+                    if len(idx_13) > 0:
+                        idxs.append((idx_12, idx_13[0]))
+
+                out_array = np.empty([len(idxs), 9])
+
+                for i, x in enumerate(idxs):
+                    idx_12, idx_13 = x
+                    point_1 = kp_12_1[idx_12]
+                    point_2 = kp_12_2[idx_12]
+                    point_3 = kp_13_3[idx_13]
+                    score_12 = scores_12[idx_12]
+                    score_13 = scores_13[idx_13]
+
+                    out_array[i] = np.array([*point_1, *point_2, *point_3, score_12, score_13, 0.0])
+
+                h5_file.create_dataset(label, shape=out_array.shape, data=out_array)
+                triplets.append(label.replace('-', ' '))
+                pbar.update(1)
+                output += 1
+
+    triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+    print("Writing list of triplets to: ", triples_txt_path)
+    with open(triples_txt_path, 'w') as f:
+        f.writelines(line + '\n' for line in triplets)
+
 
 
 def prepare_single(args, subset):
@@ -256,8 +338,11 @@ def prepare_single(args, subset):
         os.makedirs(out_dir)
 
     create_gt_h5(cameras, images, out_dir, args)
-    extract_features(img_path, images, cameras, out_dir, args)
-    create_triplets(out_dir, cameras, images, points, args)
+    if 'loftr' in args.features:
+        create_triplets_loftr(out_dir, img_path, cameras, images, points, args)
+    else:
+        extract_features(img_path, images, cameras, out_dir, args)
+        create_triplets(out_dir, cameras, images, points, args)
 
 
     # gen = cam_pair_generator(matcher, subset_path, img_path, cameras, images, points, max_pairs=num_samples)
