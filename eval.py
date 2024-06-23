@@ -243,7 +243,7 @@ def eval(args):
     if args.graph:
         basename = f'{basename}-graph'
         # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
-        iterations_list = [1000, 2000, 5000, 10000, 20000]
+        iterations_list = [1000, 2000, 5000, 10000, 20000, 50000]
         # iterations_list = [100, 200, 500, 1000, 2000]
         # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
         # iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
@@ -280,7 +280,7 @@ def eval(args):
 
                 pts = np.array(C_file[label])
                 # we only check the first two snns to be consistent with Charalambos's eval code
-                l = np.all(pts[:, 6:8] < 0.9, axis=1)
+                l = np.all(pts[:, 6:8] > 0.0, axis=1)
 
                 x1 = pts[l, 0:2]
                 x2 = pts[l, 2:4]
@@ -308,7 +308,7 @@ def eval(args):
 
         print("Done")
 
-    draw_results(results, experiments, iterations_list)
+    # draw_results(results, experiments, iterations_list)
 
     for experiment in experiments:
         print(50 * '*')
