@@ -256,6 +256,7 @@ def eval(args):
     # experiments = ['4p3v + LO']
 
     json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
+    print(f'json_path: {json_path}')
 
     if args.load:
         with open(json_path, 'r') as f:
@@ -314,6 +315,8 @@ def eval(args):
         print(50 * '*')
         print(f'Results for: {experiment}:')
         print_results([r for r in results if r['experiment'] == experiment])
+
+    os.makedirs('results', exist_ok=True)
 
     with open(json_path, 'w') as f:
         json.dump(results, f, indent=4)
