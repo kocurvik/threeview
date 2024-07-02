@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+# from multiprocessing.pool import ThreadPool as Pool
 from multiprocessing import Pool
 from time import perf_counter
 
@@ -11,8 +12,8 @@ from matplotlib import pyplot as plt
 from prettytable import PrettyTable
 from tqdm import tqdm
 
-from theory.lo_verification import skew
-from utils.geometry import rotation_angle, angle
+import utils.geometry
+from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers
 
 
 def parse_args():
@@ -26,18 +27,6 @@ def parse_args():
     parser.add_argument('dataset_path')
 
     return parser.parse_args()
-
-
-
-def get_pose(img1, img2, R_dict, T_dict):
-    R1 = np.array(R_dict[img1])
-    R2 = np.array(R_dict[img2])
-    t1 = np.array(T_dict[img1])
-    t2 = np.array(T_dict[img2])
-
-    R = R1.T @ R2
-    t = -R @ t1 + t2
-    return R, t
 
 
 def get_camera_dicts(K_file_path):
@@ -94,6 +83,8 @@ def get_result_dict(three_view_pose, info, img1, img2, img3, R_file, T_file):
     out['P_13_err'] = max(out['R_13_err'], out['t_13_err'])
     out['P_23_err'] = max(out['R_23_err'], out['t_23_err'])
 
+    out['Charalambos_P_err'] = 0.5 * (max(out['R_12_err'], out['t_12_err']) + max(out['R_13_err'], out['t_13_err']))
+
     out['P_err'] = max([v for k, v in out.items()])
     out['info'] = info
     return out
@@ -103,7 +94,7 @@ def print_results(results):
     tab = PrettyTable(['metric', 'median', 'mean', 'AUC@5', 'AUC@10', 'AUC@20'])
     tab.align["metric"] = "l"
     tab.float_format = '0.2'
-    err_names = ['P_12_err', 'P_13_err', 'P_23_err', 'P_err']
+    err_names = ['P_12_err', 'P_13_err', 'P_23_err', 'P_err', 'Charalambos_P_err']
     for err_name in err_names:
         errs = np.array([r[err_name] for r in results])
         errs[np.isnan(errs)] = 180
@@ -120,83 +111,64 @@ def print_results(results):
 
     print(tab)
 
+def print_results_summary(results, experiments):
+    tab = PrettyTable(['experiment', 'median', 'mean', 'AUC@5', 'AUC@10', 'AUC@20', 'Mean runtime', 'Med runtime'])
+    tab.float_format = '0.2'
 
-def get_gt_F(img1, img2, R_dict, T_dict, camera_dicts):
-    R1, t1 = np.array(R_dict[img1]), np.array(T_dict[img1])
-    R2, t2 = np.array(R_dict[img2]), np.array(T_dict[img2])
-    R = R2 @ R1.T
-    t = (t2 - R @ t1).ravel()
-    cam1 = camera_dicts[img1]
-    cam2 = camera_dicts[img2]
-    K1 = np.array([[cam1['params'][0], 0.0, cam1['params'][-2]], [0.0, cam1['params'][0], cam1['params'][-1]], [0, 0, 1.0]])
-    K2 = np.array([[cam2['params'][0], 0.0, cam2['params'][-2]], [0.0, cam2['params'][0], cam2['params'][-1]], [0, 0, 1.0]])
+    for experiment in experiments:
+        exp_results = [r for r in results if r['experiment'] == experiment]
+        errs = np.array([r['Charalambos_P_err'] for r in exp_results])
+        errs[np.isnan(errs)] = 180
+        res = np.array([np.sum(errs < t) / len(errs) for t in range(1, 21)])
+        runtime = [r['info']['runtime'] for r in exp_results]
+        tab.add_row([experiment, np.median(errs), np.mean(errs),
+                     np.mean(res[:5]), np.mean(res[:10]), np.mean(res),
+                     np.mean(runtime), np.median(runtime)])
 
-    return np.linalg.inv(K2.T) @ skew(t) @ R @ np.linalg.inv(K1)
+    print(tab)
 
-
-def get_inliers(F, x1, x2, threshold = 2.0):
-    pts1 = np.column_stack([x1, np.ones(len(x1))])
-    pts2 = np.column_stack([x2, np.ones(len(x2))])
-    F_t = F.T
-    line1_in_2 = pts1 @ F_t
-    line2_in_1 = pts2 @ F
-
-    # numerator = (x'^T F x) ** 2
-    numerator = np.sum(pts2 * line1_in_2, axis=1) ** 2
-
-    # denominator = (((Fx)_1**2) + (Fx)_2**2)) +  (((F^Tx')_1**2) + (F^Tx')_2**2))
-    denominator = line1_in_2[:, 0] ** 2 + line1_in_2[:, 1] ** 2 + line2_in_1[:, 0] ** 2 + line2_in_1[:, 1] ** 2
-    out = numerator / denominator
-    return out < threshold ** 2
-
-
-def add_rand_pts(x, cam_dict, multiplier):
-    x_new = np.random.rand(int(multiplier * len(x)), 2)
-    x_new[:, 0] *= cam_dict['width']
-    x_new[:, 1] *= cam_dict['height']
-    return np.row_stack([x, x_new])
-
-def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ratio):
-    F12 = get_gt_F(img1, img2, R_dict, T_dict, camera_dicts)
-    F13 = get_gt_F(img1, img3, R_dict, T_dict, camera_dicts)
-    F23 = get_gt_F(img2, img3, R_dict, T_dict, camera_dicts)
-
-    inliers_12 = get_inliers(F12, x1, x2, 2.0)
-    inliers_13 = get_inliers(F13, x1, x3, 2.0)
-    inliers_23 = get_inliers(F23, x2, x3, 2.0)
-
-    l = np.logical_and(np.logical_and(inliers_12, inliers_13), inliers_23)
-
-    # print(np.sum(inliers_12), np.sum(inliers_13), np.sum(inliers_23), np.sum(l), len(x1))
-
-    multiplier = (1 - ratio) / ratio
-
-    x1, x2, x3 = x1[l], x2[l], x3[l]
-
-    x1 = add_rand_pts(x1, camera_dicts[img1], multiplier)
-    x2 = add_rand_pts(x2, camera_dicts[img2], multiplier)
-    x3 = add_rand_pts(x3, camera_dicts[img3], multiplier)
-
-    return x1, x2, x3
 
 def eval_experiment(x):
     experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
 
-    inner_refine = 100 if 'R' in experiment else 0
-    delta = 0.1 if 'D' in experiment else 0.0
-    num_pts = int(experiment[0])
-    if iterations is not None:
-        ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                       'min_iterations': iterations,'max_iterations': iterations, 'lo_iterations': 25 if 'LO' in experiment else 0,
-                       'inner_refine': inner_refine, 'threeview_check': 'C' in experiment, 'sample_sz': num_pts, 'delta': delta}
-    else:
-        ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                       'min_iterations': 100,'max_iterations': 10000, 'lo_iterations': 25 if 'LO' in experiment else 0,
-                       'inner_refine': inner_refine, 'threeview_check': 'C' in experiment, 'sample_sz': num_pts, 'delta': delta}
+    use_net = '(L)' in experiment or '(L+D)' in experiment
+    init_net = '(L+ID)' in experiment
+    use_hc = 'HC' in experiment
+    threeview_check = '+ C' in experiment
+    oracle = '(O)' in experiment
 
-    bundle_dict = {'verbose': False, 'max_iterations': 100 if 'LO' in experiment else 0}
+    # using R
+    inner_refine = 10 if '+ R' in experiment else 0
+    lo_iterations = 0 if '+ nLO' in experiment else 25
+
+    # using delta
+    if 'D' in experiment:
+        if use_net or init_net:
+            delta = 0.0125
+        else:
+            delta = 0.025
+    else:
+        delta = 0
+
+    num_pts = int(experiment[0])
+    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
+                   'min_iterations': 50, 'max_iterations': 10000, 'lo_iterations': lo_iterations,
+                   'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
+                   'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
+
+    if iterations is not None:
+        ransac_dict['min_iterations'] = iterations
+        ransac_dict['max_iterations'] = iterations
+
+    if oracle:
+        gt_E = get_gt_E(img1, img2, R_dict, T_dict, camera_dicts)
+        ransac_dict['gt_E'] = gt_E
+
+    bundle_dict = {'verbose': False, 'max_iterations': 0 if ' + nLO' in experiment else 100}
     start = perf_counter()
-    three_view_pose, info = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dicts[img1], camera_dicts[img2], camera_dicts[img3], ransac_dict, bundle_dict)
+    three_view_pose, info = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dicts[img1],
+                                                                      camera_dicts[img2], camera_dicts[img3],
+                                                                      ransac_dict, bundle_dict)
     info['runtime'] = 1000 * (perf_counter() - start)
     result_dict = get_result_dict(three_view_pose, info, img1, img2, img3, R_dict, T_dict)
     result_dict['experiment'] = experiment
@@ -222,7 +194,7 @@ def draw_results(results, experiments, iterations_list):
         for iterations in iterations_list:
             iter_results = [x for x in experiment_results if x['info']['iterations'] == iterations]
             mean_runtime = np.mean([x['info']['runtime'] for x in iter_results])
-            errs = np.array([r['P_err'] for r in iter_results])
+            errs = np.array([r['Charalambos_P_err'] for r in iter_results])
             errs[np.isnan(errs)] = 180
             AUC10 = np.mean(np.array([np.sum(errs < t) / len(errs) for t in range(1, 11)]))
 
@@ -242,17 +214,27 @@ def eval(args):
     basename = os.path.basename(dataset_path)
     if args.graph:
         basename = f'{basename}-graph'
-        # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
-        iterations_list = [1000, 2000, 5000, 10000, 20000, 50000]
+        iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
+        # iterations_list = [10000, 20000, 50000, 100000]
         # iterations_list = [100, 200, 500, 1000, 2000]
         # iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
         # iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
     else:
         iterations_list = [None]
 
-    # experiments = ['4p3v + LO', '4p3v + LO + C',  '4p3v + R + LO + C', '5p3v + LO', '5p3v + LO + C']
-    # experiments = ['4p3v + LO', '4p3v + LO + D', '5p3v + LO', '4p3v + LO + C', '4p3v + LO + D + C', '5p3v + LO + C']
-    experiments = ['4p3v + LO', '4p3v + LO + C', '4p3v + LO + D', '4p3v + LO + D + C', '5p3v + LO', '5p3v + LO + C']
+
+    # experiments = ['4p3v(M)', '4p3v(D)', '4p3v(O)', '5p3v']
+    # experiments = ['4p3v(M)', '4p3v(O)', '5p3v']
+    experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p(HC)', '5p3v']
+    experiments.extend([x + ' + C' for x in experiments])
+    experiments.extend([x + ' + R' for x in experiments])
+
+
+    # experiments = ['5p3v + LO + C', '4L + LO + C', '4L + LO + D + C', '4IL + LO + C']
+    # experiments = ['5p3v + LO + C', '4IL + LO + C']
+    # experiments = ['5p3v + LO', '4p3v', '4O + LO', '4O']
+    # experiments = ['4IL + LO + C']
+    # experiments = ['5p3v + LO + C', '4L + LO + C', '4L + LO + D + C']
     # experiments = ['4p3v + LO']
 
     json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
@@ -281,21 +263,30 @@ def eval(args):
 
                 pts = np.array(C_file[label])
                 # we only check the first two snns to be consistent with Charalambos's eval code
-                l = np.all(pts[:, 6:8] > 0.0, axis=1)
+                if 'SIFT_triplet_correspondences' in matches_basename:
+                    l = np.all(pts[:, 6:8] <= 0.8, axis=1)
+                else:
+                    l = np.all(pts[:, 6:8] >= 0.5, axis=1)
 
                 x1 = pts[l, 0:2]
                 x2 = pts[l, 2:4]
                 x3 = pts[l, 4:6]
 
+                R_dict_l = {x: R_dict[x] for x in [img1, img2, img3]}
+                T_dict_l = {x: T_dict[x] for x in [img1, img2, img3]}
+                camera_dicts_l = {x: camera_dicts[x] for x in [img1, img2, img3]}
+
+
                 if args.force_inliers is not None:
-                    x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, args.force_inliers)
+                    x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict_l, T_dict_l, camera_dicts_l,
+                                               args.force_inliers)
                     if len(x1) < 25:
                         continue
 
                 for iterations in iterations_list:
                     for experiment in experiments:
                         # yield experiment, img1, img2, img3, x1, x2, x3, RR_dict, TT_dict, cam_dicts
-                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts
+                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict_l, T_dict_l, camera_dicts_l
 
 
         total_length = len(experiments) * len(triplets) * len(iterations_list)
@@ -309,17 +300,23 @@ def eval(args):
 
         print("Done")
 
-    # draw_results(results, experiments, iterations_list)
-
     for experiment in experiments:
         print(50 * '*')
         print(f'Results for: {experiment}:')
         print_results([r for r in results if r['experiment'] == experiment])
 
+    print(50 * '*')
+    print(50 * '*')
+    print(50 * '*')
+    print_results_summary(results, experiments)
+
     os.makedirs('results', exist_ok=True)
 
-    with open(json_path, 'w') as f:
-        json.dump(results, f, indent=4)
+    if not args.load:
+        with open(json_path, 'w') as f:
+            json.dump(results, f, indent=4)
+
+    draw_results(results, experiments, iterations_list)
 
 if __name__ == '__main__':
     args = parse_args()

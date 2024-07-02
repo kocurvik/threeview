@@ -3,7 +3,8 @@ import poselib
 from matplotlib import pyplot as plt
 from scipy.spatial.transform import Rotation
 
-from utils import rotation_angle
+from theory.lo_verification import skew
+from utils.geometry import rotation_angle, angle
 
 
 def generate_points(num_pts, f, distance, depth, width=640, height=480):
@@ -85,7 +86,7 @@ def plot_scene(points, R, t, f, width=640, height=480, color_1='black', color_2=
     plt.title(name)
 
 
-def get_scene(f, R1, t1, R2, t2, num_pts, X=None, min_distance=1, depth=1, width=640, height=480, sigma_p=0.0, plot=None, seed=None):
+def get_scene(f, R1, t1, R2, t2, num_pts, X=None, min_distance=2, depth=1, width=640, height=480, sigma_p=0.0, plot=None, seed=None):
     if seed is not None:
         np.random.seed(seed)
     K = np.diag([f, f, 1])
@@ -117,7 +118,7 @@ def get_scene(f, R1, t1, R2, t2, num_pts, X=None, min_distance=1, depth=1, width
 def run_synth():
     f = 600
     R12 = Rotation.from_euler('xyz', (0, 60, 0), degrees=True).as_matrix()
-    R13 = Rotation.from_euler('xyz', (0, 30, 0), degrees=True).as_matrix()
+    R13 = Rotation.from_euler('xyz', (0, -30, 0), degrees=True).as_matrix()
     c1 = np.array([2 * f, 0, f])
     c2 = np.array([0, f, 0.5 * f])
     # R = Rotation.from_euler('xyz', (theta, 30, 0), degrees=True).as_matrix()
@@ -129,14 +130,14 @@ def run_synth():
 
     sigma = 0.5
 
-    x1 += sigma * np.random.randn(*(x1.shape))
-    x2 += sigma * np.random.randn(*(x1.shape))
-    x3 += sigma * np.random.randn(*(x1.shape))
+    # x1 += sigma * np.random.randn(*(x1.shape))
+    # x2 += sigma * np.random.randn(*(x1.shape))
+    # x3 += sigma * np.random.randn(*(x1.shape))
 
-    # idxs1 = np.random.permutation(np.arange(30))
-    # x1[:30] = x1[idxs1]
-    # idxs2 = np.random.permutation(np.arange(30, 60))
-    # x2[30:60] = x2[idxs2]
+    idxs1 = np.random.permutation(np.arange(30))
+    x1[:30] = x1[idxs1]
+    idxs2 = np.random.permutation(np.arange(30, 60))
+    x2[30:60] = x2[idxs2]
 
 
     T12 = np.diag([0, 0, 0, 1.0])
@@ -147,36 +148,85 @@ def run_synth():
     T13[:3, 3] = t13
 
     T23 = T13 @ np.linalg.inv(T12)
+    R23 = T23[:3, :3]
+    t23 = T23[:3, 3]
+
     camera_dict =  {'model': 'SIMPLE_PINHOLE', 'width': 640, 'height': 480, 'params': [f, 0, 0]}
 
     # print(out)
     # print('**********')
 
-    ransac_dict = {'max_epipolar_error': 0.5, 'progressive_sampling': False, 'min_iterations': 10}
+    # ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
+    #                'min_iterations': 100, 'max_iterations': 10000, 'lo_iterations': 25,
+    #                'inner_refine': False, 'threeview_check': True, 'sample_sz': 6,
+    #                'delta': 0.025}
+    #
+    # pose, out6 = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, np.array([0.0, 0.0]), ransac_dict, {'verbose': False})
+    # print("Rot errs 6p")
+    # print(pose.camera.focal())
+    # print(rotation_angle(pose.poses.pose12.R.T @ R12))
+    # print(rotation_angle(pose.poses.pose13.R.T @ R13))
+    # print(out6['num_inliers'])
+    #
+    # ransac_dict['sample_sz'] = 5
+    # pose, out5 = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, np.array([0, 0]), ransac_dict, {'verbose': False})
+    # print("Rot errs 5p")
+    # print(pose.camera.focal())
+    # print(rotation_angle(pose.poses.pose12.R.T @ R12))
+    # print(rotation_angle(pose.poses.pose13.R.T @ R13))
+    #
+    # ransac_dict['sample_sz'] = 4
+    # pose, out4 = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, np.array([0, 0]), ransac_dict, {'verbose': False})
+    # print("Rot errs 4p")
+    # print(pose.camera.focal())
+    # print(rotation_angle(pose.poses.pose12.R.T @ R12))
+    # print(rotation_angle(pose.poses.pose13.R.T @ R13))
+    #
+    # return out6['iterations'], out5['iterations'], out4['iterations']
 
-    pose, out5 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, 5, False, ransac_dict, {'verbose': False})
-    print("Rot errs 5p")
+    ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
+                   'min_iterations': 100, 'max_iterations': 10000, 'lo_iterations': 25,
+                   'inner_refine': False, 'threeview_check': True, 'sample_sz': 5,
+                   'delta': 0.025, 'use_hc': False}
+
+    # pose, out5 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
+    # print("Rot errs 5p")
+    # print(rotation_angle(pose.pose12.R.T @ R12))
+    # print(rotation_angle(pose.pose13.R.T @ R13))
+    #
+    # ransac_dict['sample_sz'] = 4
+    #
+    # pose, out4 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
+    # print("Rot errs 4p")
+    # print(rotation_angle(pose.pose12.R.T @ R12))
+    # print(rotation_angle(pose.pose13.R.T @ R13))
+
+    # ransac_dict['use_net'] = False
+    # ransac_dict['use_init'] = True
+    ransac_dict['sample_sz'] = 4
+    ransac_dict['gt_E'] = skew(t12) @ R12
+    print(ransac_dict['gt_E'])
+    pose, outR = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
+    # if (angle(pose.pose23().t, t23) > 1):
+    print("Rot errs L")
     print(rotation_angle(pose.pose12.R.T @ R12))
     print(rotation_angle(pose.pose13.R.T @ R13))
+    print(rotation_angle(pose.pose23().R.T @ R23))
 
-    pose, out4 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, 4, False, ransac_dict, {'verbose': False})
-    print("Rot errs 4p")
-    print(rotation_angle(pose.pose12.R.T @ R12))
-    print(rotation_angle(pose.pose13.R.T @ R13))
+    print(angle(pose.pose12.t, t12))
+    print(angle(pose.pose13.t, t13))
+    print(angle(pose.pose23().t, t23))
+    print(outR['num_inliers'])
 
+    # return out5['iterations'], out4['iterations'], outR['iterations']
+    return
 
-    pose, outR = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, 4, True, ransac_dict, {'verbose': False})
-    print("Rot errs 4p + R")
-    print(rotation_angle(pose.pose12.R.T @ R12))
-    print(rotation_angle(pose.pose13.R.T @ R13))
-
-    return out5['iterations'], out4['iterations'], outR['iterations']
 
 if __name__ == '__main__':
     iters = [run_synth() for _ in range(100)]
-    iters5 = [x[0] for x in iters]
-    iters4 = [x[1] for x in iters]
-    itersR = [x[2] for x in iters]
+    iters6 = [x[0] for x in iters]
+    iters5 = [x[1] for x in iters]
+    iters4 = [x[2] for x in iters]
+    print(f"Mean iters6: {np.mean(iters6)} - Median iters6: {np.nanmedian(iters6)}")
     print(f"Mean iters5: {np.mean(iters5)} - Median iters5: {np.nanmedian(iters5)}")
     print(f"Mean iters4: {np.mean(iters4)} - Median iters4: {np.nanmedian(iters4)}")
-    print(f"Mean itersR: {np.mean(itersR)} - Median itersR: {np.nanmedian(itersR)}")
