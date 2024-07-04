@@ -12,14 +12,13 @@ from matplotlib import pyplot as plt
 from prettytable import PrettyTable
 from tqdm import tqdm
 
-import utils.geometry
-from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers
+from theory.lo_verification import skew
+from utils.geometry import rotation_angle, angle #, get_pose, get_gt_E
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--first', type=int, default=None)
-    parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
@@ -28,64 +27,48 @@ def parse_args():
 
     return parser.parse_args()
 
+def get_pose(img1, img2, R_dict, T_dict):
+    R1 = np.array(R_dict[img1])
+    R2 = np.array(R_dict[img2])
+    t1 = np.array(T_dict[img1])
+    t2 = np.array(T_dict[img2])
 
-def get_camera_dicts(K_file_path):
-    K_file = h5py.File(K_file_path)
-
-    d = {}
-
-    # Treat data from Charalambos differently since it is in pairs
-    if 'K1_K2' in K_file_path:
-
-        for k, v in K_file.items():
-            key1, key2 = k.split('-')
-            if key1 not in d.keys():
-                K1 = np.array(v)[0, 0]
-                d[key1] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K1[0, 2]), 'height': int(2 * K1[1,2]), 'params': [K1[0, 0], K1[0, 2], K1[1, 2]]}
-            if key2 not in d.keys():
-                K2 = np.array(v)[0, 1]
-                d[key2] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K2[0, 2]), 'height': int(2 * K2[1,2]), 'params': [K2[0, 0], K2[0, 2], K2[1, 2]]}
-
-        return d
-
-    for key, v in K_file.items():
-        K = np.array(v)
-        d[key] = {'model': 'PINHOLE', 'width': int(2 * K[0, 2]), 'height': int(2 * K[1,2]), 'params': [K[0, 0], K[1, 1], K[0, 2], K[1, 2]]}
-
-    return d
-
-def get_triplets(txt_path):
-    with open(txt_path, 'r') as f:
-        lines = f.readlines()
-
-    return [line.strip().split(' ') for line in lines]
+    R = R1.T @ R2
+    t = R1.T @ (t2 - t1)
+    return R, t
 
 
-def get_result_dict(three_view_pose, info, img1, img2, img3, R_file, T_file):
-    gt_R_12, gt_t_12 = get_pose(img1, img2, R_file, T_file)
+
+def get_result_dict(image_triplet, info, img1, img2, img3, R_file, T_file):
+    gt_R_12 = np.eye(3)
+    gt_t_12 = np.array([-3.861448000000e+02, 0.0, 0.0])
+
     gt_R_13, gt_t_13 = get_pose(img1, img3, R_file, T_file)
-    gt_R_23, gt_t_23 = get_pose(img2, img3, R_file, T_file)
+    # gt_R_23, gt_t_23 = get_pose(img2, img3, R_file, T_file)
 
-    R_12, t_12 = three_view_pose.pose12.R, three_view_pose.pose12.t
-    R_13, t_13 = three_view_pose.pose13.R, three_view_pose.pose13.t
-    R_23, t_23 = three_view_pose.pose23().R, three_view_pose.pose23().t
+    R_12, t_12 = image_triplet.poses.pose12.R, image_triplet.poses.pose12.t
+    R_13, t_13 = image_triplet.poses.pose13.R, image_triplet.poses.pose13.t
+    # R_23, t_23 = three_view_pose.pose23().R, three_view_pose.pose23().t
 
     out = {}
     out['R_12_err'] = rotation_angle(R_12.T @ gt_R_12)
     out['R_13_err'] = rotation_angle(R_13.T @ gt_R_13)
-    out['R_23_err'] = rotation_angle(R_23.T @ gt_R_23)
+    # out['R_23_err'] = rotation_angle(R_23.T @ gt_R_23)
 
     out['t_12_err'] = angle(t_12, gt_t_12)
     out['t_13_err'] = angle(t_13, gt_t_13)
-    out['t_23_err'] = angle(t_23, gt_t_23)
+    # out['t_23_err'] = angle(t_23, gt_t_23)
 
     out['P_12_err'] = max(out['R_12_err'], out['t_12_err'])
     out['P_13_err'] = max(out['R_13_err'], out['t_13_err'])
-    out['P_23_err'] = max(out['R_23_err'], out['t_23_err'])
+    # out['P_23_err'] = max(out['R_23_err'], out['t_23_err'])
 
-    out['Charalambos_P_err'] = 0.5 * (max(out['R_12_err'], out['t_12_err']) + max(out['R_13_err'], out['t_13_err']))
+    out['Charalambos_P_err'] = max(0.5 * (out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err']))
 
-    out['P_err'] = max([v for k, v in out.items()])
+    out['gt_f'] = 7.188560000000e+02
+    out['f_est'] = image_triplet.camera.params[0]
+    out['f_err'] = np.abs(out['gt_f'] - out['f_est']) / out['gt_f']
+    # out['P_err'] = max([v for k, v in out.items()])
     out['info'] = info
     return out
 
@@ -94,7 +77,7 @@ def print_results(results):
     tab = PrettyTable(['metric', 'median', 'mean', 'AUC@5', 'AUC@10', 'AUC@20'])
     tab.align["metric"] = "l"
     tab.float_format = '0.2'
-    err_names = ['P_12_err', 'P_13_err', 'P_23_err', 'P_err', 'Charalambos_P_err']
+    err_names = ['R_12_err', 'R_13_err', 't_12_err', 't_13_err', 'P_12_err', 'P_13_err', 'Charalambos_P_err', 'f_err']
     for err_name in err_names:
         errs = np.array([r[err_name] for r in results])
         errs[np.isnan(errs)] = 180
@@ -129,7 +112,7 @@ def print_results_summary(results, experiments):
 
 
 def eval_experiment(x):
-    experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
+    experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dict = x
 
     use_net = '(L)' in experiment or '(L+D)' in experiment
     init_net = '(L+ID)' in experiment
@@ -151,7 +134,7 @@ def eval_experiment(x):
         delta = 0
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 3.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
@@ -161,16 +144,18 @@ def eval_experiment(x):
         ransac_dict['max_iterations'] = iterations
 
     if oracle:
-        gt_E = get_gt_E(img1, img2, R_dict, T_dict, camera_dicts)
-        ransac_dict['gt_E'] = gt_E
+        gt_t_12 = np.array([-3.861448000000e+02, 0.0, 0.0])
+        K = np.array([[7.188560000000e+02, 0.0, 6.071928000000e+02], [0.0, 7.188560000000e+02, 1.852157000000e+02], [0.0, 0.0, 1.0]])
+        K_inv = np.linalg.inv(K)
+        E = K_inv.T @ (skew(-gt_t_12) @ K_inv)
+        ransac_dict['gt_E'] = E
 
     bundle_dict = {'verbose': False, 'max_iterations': 0 if ' + nLO' in experiment else 100}
     start = perf_counter()
-    three_view_pose, info = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dicts[img1],
-                                                                      camera_dicts[img2], camera_dicts[img3],
-                                                                      ransac_dict, bundle_dict)
+    pp = np.array(camera_dict['params'][-2:])
+    image_triplet, info = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, pp, ransac_dict, bundle_dict)
     info['runtime'] = 1000 * (perf_counter() - start)
-    result_dict = get_result_dict(three_view_pose, info, img1, img2, img3, R_dict, T_dict)
+    result_dict = get_result_dict(image_triplet, info, img1, img2, img3, R_dict, T_dict)
     result_dict['experiment'] = experiment
     result_dict['img1'] = img1
     result_dict['img2'] = img2
@@ -208,6 +193,21 @@ def draw_results(results, experiments, iterations_list):
     plt.legend()
     plt.show()
 
+
+def get_pose_dicts(path):
+    R_dict = {}
+    T_dict = {}
+
+    arr = np.loadtxt(path)
+    for i, row in enumerate(arr):
+        T = np.reshape(row, (3, 4))
+        R_dict[i] = T[:, :3]
+        # These are not translations but something else
+        T_dict[i] = - T[:, 3]
+
+    return R_dict, T_dict
+
+
 def eval(args):
     dataset_path = args.dataset_path
     matches_basename = os.path.basename(args.feature_file)
@@ -218,13 +218,10 @@ def eval(args):
     else:
         iterations_list = [None]
 
-    if args.force_inliers is not None:
-        basename = f'{basename}-{args.force_inliers:.1f}inliers'
-
-
-    experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
+    experiments = ['4p3vf(M)', '4p3vf(M+D)', '4p3vf(L)', '4p3vf(L+D)', '4p3vf(L+ID)', '4p3vf(O)', '6p3vf']
     experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
+
 
     json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
     print(f'json_path: {json_path}')
@@ -233,53 +230,46 @@ def eval(args):
         with open(json_path, 'r') as f:
             results = json.load(f)
     else:
-        R_file = h5py.File(os.path.join(dataset_path, 'R.h5'))
-        T_file = h5py.File(os.path.join(dataset_path, 'T.h5'))
         C_file = h5py.File(os.path.join(dataset_path, f'{args.feature_file}.h5'))
-        triplets = get_triplets(os.path.join(dataset_path, f'{args.feature_file}.txt'))
+        R_dict, T_dict = get_pose_dicts(os.path.join(dataset_path, 'poses', '00.txt'))
+        camera_dict = {'model': 'SIMPLE_PINHOLE', 'width': -1, 'height': -1,
+                       'params': [7.188560000000e+02, 6.071928000000e+02, 1.852157000000e+02]}
 
-        R_dict = {k: np.array(v) for k, v in R_file.items()}
-        T_dict = {k: np.array(v) for k, v in T_file.items()}
-        camera_dicts = get_camera_dicts(os.path.join(dataset_path, 'K.h5'))
+        labels = [x for x in C_file.keys() if len(x.split('-')) == 3]
 
         if args.first is not None:
-            triplets = triplets[:args.first]
+            labels = labels[:args.first]
 
         def gen_data():
-            for triplet in triplets:
-                img1, img2, img3 = triplet
-                label = f"{img1}-{img2}-{img3}"
+            for label in labels:
+                img1, img2, img3 = label.split('-')
+
+                try:
+                    img1 = int(img1.split('_')[1].split('.')[0])
+                    img3 = int(img3.split('.')[0])
+                except Exception:
+                    continue
 
                 pts = np.array(C_file[label])
                 # we only check the first two snns to be consistent with Charalambos's eval code
-                if 'SIFT_triplet_correspondences' in matches_basename:
-                    l = np.all(pts[:, 6:8] <= 0.9, axis=1)
-                else:
-                    l = np.all(pts[:, 6:8] >= 0.5, axis=1)
+                # if 'SIFT_triplet_correspondences' in matches_basename:
+                l = np.all(pts[:, 6:8] <= 0.9, axis=1)
 
                 x1 = pts[l, 0:2]
                 x2 = pts[l, 2:4]
                 x3 = pts[l, 4:6]
 
-                R_dict_l = {x: R_dict[x] for x in [img1, img2, img3]}
-                T_dict_l = {x: T_dict[x] for x in [img1, img2, img3]}
-                camera_dicts_l = {x: camera_dicts[x] for x in [img1, img2, img3]}
-
-
-                if args.force_inliers is not None:
-                    x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict_l, T_dict_l, camera_dicts_l,
-                                               args.force_inliers)
-                    if len(x1) < 25:
-                        continue
+                R_dict_l = {x: R_dict[x] for x in [img1, img3]}
+                T_dict_l = {x: T_dict[x] for x in [img1, img3]}
 
                 for iterations in iterations_list:
                     for experiment in experiments:
                         # yield experiment, img1, img2, img3, x1, x2, x3, RR_dict, TT_dict, cam_dicts
-                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict_l, T_dict_l, camera_dicts_l
+                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict_l, T_dict_l, camera_dict
 
 
-        total_length = len(experiments) * len(triplets) * len(iterations_list)
-        print(f"Total runs: {total_length} for {len(triplets)} samples")
+        total_length = len(experiments) * len(labels) * len(iterations_list)
+        print(f"Total runs: {total_length} for {len(labels)} samples")
 
         if args.num_workers == 1:
             results = [eval_experiment(x) for x in tqdm(gen_data(), total=total_length)]
