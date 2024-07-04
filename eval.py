@@ -144,14 +144,14 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.0125
+            delta = 0.00625
         else:
-            delta = 0.025
+            delta = 0.00625
     else:
         delta = 0
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 3.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
