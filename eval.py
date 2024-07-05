@@ -302,7 +302,7 @@ def eval(args):
 
         print("Done")
 
-    if args.load:
+    if args.append:
         print(f"Appending from: {json_path}")
         with open(json_path, 'r') as f:
             prev_results = json.load(f)
