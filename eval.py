@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('--all', action='store_true', default=False)
     parser.add_argument('feature_file')
     parser.add_argument('dataset_path')
 
@@ -85,9 +86,10 @@ def get_result_dict(three_view_pose, info, img1, img2, img3, R_file, T_file):
     out['P_13_err'] = max(out['R_13_err'], out['t_13_err'])
     out['P_23_err'] = max(out['R_23_err'], out['t_23_err'])
 
-    out['Charalambos_P_err'] = 0.5 * (max(out['R_12_err'], out['t_12_err']) + max(out['R_13_err'], out['t_13_err']))
-
     out['P_err'] = max([v for k, v in out.items()])
+    out['Charalambos_P_err'] = max(0.5 *(out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err']))
+    out['1/3 P_err'] = max((out['R_12_err'] + out['R_13_err'] + out['R_23_err'])/3, (out['t_12_err'] + out['t_13_err'] + out['t_23_err'])/3)
+
     info['inliers'] = []
     out['info'] = info
     return out
@@ -121,6 +123,7 @@ def print_results_summary(results, experiments):
     for experiment in experiments:
         exp_results = [r for r in results if r['experiment'] == experiment]
         errs = np.array([r['Charalambos_P_err'] for r in exp_results])
+        # errs = np.array([r['P_err'] for r in exp_results])
         errs[np.isnan(errs)] = 180
         res = np.array([np.sum(errs < t) / len(errs) for t in range(1, 21)])
         runtime = [r['info']['runtime'] for r in exp_results]
@@ -186,7 +189,7 @@ def eval_experiment(x):
     return result_dict
 
 
-def draw_results(results, experiments, iterations_list):
+def draw_results(results, experiments, iterations_list, scene=None, features=None):
     plt.figure()
 
     for experiment in experiments:
@@ -198,7 +201,9 @@ def draw_results(results, experiments, iterations_list):
         for iterations in iterations_list:
             iter_results = [x for x in experiment_results if x['info']['iterations'] == iterations]
             mean_runtime = np.mean([x['info']['runtime'] for x in iter_results])
-            errs = np.array([r['Charalambos_P_err'] for r in iter_results])
+            errs = np.array([max(1/3 *(out['R_12_err'] + out['R_13_err'] + out['R_23_err']), 1/3 * (out['t_12_err'] + out['t_13_err'] + out['t_23_err'])) for out in iter_results])
+            # errs = np.array([max(0.5 *(out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err'])) for out in iter_results])
+            errs = np.array([r['P_err'] for r in iter_results])
             errs[np.isnan(errs)] = 180
             AUC10 = np.mean(np.array([np.sum(errs < t) / len(errs) for t in range(1, 11)]))
 
@@ -207,10 +212,30 @@ def draw_results(results, experiments, iterations_list):
 
         plt.semilogx(xs, ys, label=experiment, marker='*')
 
+    title = ''
+    if scene is not None:
+        title += f'Scene: {scene} \n'
+    if features is not None:
+        title += f'Matches: {features}\n'
+
+    title += f"Error: max(1/3 *(out['R_12_err'] + out['R_13_err'] + out['R_23_err']), 1/3 * (out['t_12_err'] + out['t_13_err'] + out['t_23_err'])"
+
+    plt.title(title, fontsize=8)
+
+
     plt.xlabel('Mean runtime (ms)')
     plt.ylabel('AUC@10$\\deg$')
     plt.legend()
     plt.show()
+
+
+def fix_ch_err(results):
+    for out in results:
+        out['Charalambos P_err'] = max(0.5 * (out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err']))
+
+
+
+
 
 def eval(args):
     dataset_path = args.dataset_path
@@ -229,12 +254,17 @@ def eval(args):
 
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
-    experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-                   '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
-                   '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C',
-                   '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C',
-                   '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C',
-                   '4p(HC)', '5p3v']
+    if args.all:
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
+                       '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C',
+                       '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C',
+                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C',
+                       '4p(HC)', '5p3v']
+    else:
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
+                       '4p(HC)', '5p3v']
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
@@ -308,6 +338,8 @@ def eval(args):
             prev_results = json.load(f)
         results.extend(prev_results)
 
+    fix_ch_err(results)
+
     for experiment in experiments:
         print(50 * '*')
         print(f'Results for: {experiment}:')
@@ -324,7 +356,7 @@ def eval(args):
         with open(json_path, 'w') as f:
             json.dump(results, f, indent=4)
 
-    draw_results(results, experiments, iterations_list)
+    draw_results(results, experiments, iterations_list, scene=os.path.basename(dataset_path), features=matches_basename)
 
 if __name__ == '__main__':
     args = parse_args()
