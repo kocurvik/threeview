@@ -125,7 +125,7 @@ def print_results_summary(results, experiments):
         res = np.array([np.sum(errs < t) / len(errs) for t in range(1, 21)])
         runtime = [r['info']['runtime'] for r in exp_results]
         tab.add_row([experiment, np.median(errs), np.mean(errs),
-                     np.mean(res[:5]), np.mean(res[:10]), np.mean(res),
+                     100 * np.mean(res[:5]), 100 * np.mean(res[:10]), 100 * np.mean(res),
                      np.mean(runtime), np.median(runtime)])
 
     print(tab)
