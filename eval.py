@@ -234,7 +234,7 @@ def eval(args):
                    '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C',
                    '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C',
                    '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C',
-                   '4p(HC)' '5p3v']
+                   '4p(HC)', '5p3v']
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
