@@ -147,9 +147,9 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.00625
+            delta = 0.006
         else:
-            delta = 0.00625
+            delta = 0.006
     else:
         delta = 0
 
