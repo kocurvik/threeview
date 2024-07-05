@@ -24,6 +24,7 @@ def parse_args():
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
+    parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('feature_file')
     parser.add_argument('dataset_path')
 
@@ -227,7 +228,13 @@ def eval(args):
 
 
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
-    experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
+    # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
+    experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+                   '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
+                   '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C',
+                   '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C',
+                   '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C',
+                   '4p(HC)' '5p3v']
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
@@ -237,6 +244,7 @@ def eval(args):
     if args.load:
         with open(json_path, 'r') as f:
             results = json.load(f)
+
     else:
         R_file = h5py.File(os.path.join(dataset_path, 'R.h5'))
         T_file = h5py.File(os.path.join(dataset_path, 'T.h5'))
@@ -293,6 +301,12 @@ def eval(args):
             results = [x for x in pool.imap(eval_experiment, tqdm(gen_data(), total=total_length))]
 
         print("Done")
+
+    if args.load:
+        print(f"Appending from: {json_path}")
+        with open(json_path, 'r') as f:
+            prev_results = json.load(f)
+        results.extend(prev_results)
 
     for experiment in experiments:
         print(50 * '*')
