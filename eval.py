@@ -8,6 +8,7 @@ from time import perf_counter
 import poselib
 import h5py
 import numpy as np
+import torch
 from matplotlib import pyplot as plt
 from prettytable import PrettyTable
 from tqdm import tqdm
@@ -86,6 +87,7 @@ def get_result_dict(three_view_pose, info, img1, img2, img3, R_file, T_file):
     out['Charalambos_P_err'] = 0.5 * (max(out['R_12_err'], out['t_12_err']) + max(out['R_13_err'], out['t_13_err']))
 
     out['P_err'] = max([v for k, v in out.items()])
+    info['inliers'] = []
     out['info'] = info
     return out
 
@@ -129,6 +131,7 @@ def print_results_summary(results, experiments):
 
 
 def eval_experiment(x):
+    torch.set_num_threads(1)
     experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
 
     use_net = '(L)' in experiment or '(L+D)' in experiment
@@ -215,6 +218,7 @@ def eval(args):
     if args.graph:
         basename = f'{basename}-graph'
         iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
+        # iterations_list = [20000, 50000]
     else:
         iterations_list = [None]
 
@@ -222,8 +226,9 @@ def eval(args):
         basename = f'{basename}-{args.force_inliers:.1f}inliers'
 
 
-    experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
-    experiments.extend([x + ' + C' for x in experiments])
+    # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
+    experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
+    # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
     json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
