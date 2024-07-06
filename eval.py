@@ -269,11 +269,11 @@ def eval(args):
                        '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
                        '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C', '4p3v(L+D) + C',
                        '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C',
-                       '4p(HC)', '5p3v']
+                       '4p(HC)', '5p3v', '4p3v(O)']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
-                       '4p(HC)', '5p3v']
+                       '4p(HC)', '5p3v', '4p3v(O)']
 
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10, 15, 20]]
