@@ -26,6 +26,7 @@ def parse_args():
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
     parser.add_argument('feature_file')
     parser.add_argument('dataset_path')
@@ -148,11 +149,10 @@ def eval_experiment(x):
     # using R
     inner_refine = 10 if '+ R' in experiment else 0
     if '+ R(' in experiment:
-        match = re.search(experiment, r'R\((\d+)\)')
-        if match:
-            inner_refine = int(match.group(1))
-        else:
-            raise ValueError("No integer value found in the given expression.")
+        idx = experiment.find('R(')
+        idx_end = experiment[idx+2:].find(')')
+        inner_refine = int(experiment[idx+2:idx + 2 + idx_end])
+
 
     lo_iterations = 0 if '+ nLO' in experiment else 25
 
@@ -273,6 +273,9 @@ def eval(args):
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
                        '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
                        '4p(HC)', '5p3v']
+
+    if args.refine:
+        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 3, 5, 10, 15, 20, 25, 100]]
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
