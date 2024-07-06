@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import re
 # from multiprocessing.pool import ThreadPool as Pool
 from multiprocessing import Pool
 from time import perf_counter
@@ -146,6 +147,13 @@ def eval_experiment(x):
 
     # using R
     inner_refine = 10 if '+ R' in experiment else 0
+    if '+ R(' in experiment:
+        match = re.search(experiment, r'R\((\d+)\)')
+        if match:
+            inner_refine = int(match.group(1))
+        else:
+            raise ValueError("No integer value found in the given expression.")
+
     lo_iterations = 0 if '+ nLO' in experiment else 25
 
     # using delta
