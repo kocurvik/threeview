@@ -147,7 +147,7 @@ def eval_experiment(x):
     oracle = '(O)' in experiment
 
     # using R
-    inner_refine = 10 if '+ R' in experiment else 0
+    inner_refine = 2 if '+ R' in experiment else 0
     if '+ R(' in experiment:
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
@@ -264,19 +264,20 @@ def eval(args):
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
     if args.all:
-        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
-                       '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C',
-                       '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C',
-                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C',
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
+                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
+                       '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
+                       '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C', '4p3v(L+D) + C',
+                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C',
                        '4p(HC)', '5p3v']
     else:
-        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C',
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
+                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
                        '4p(HC)', '5p3v']
 
     if args.refine:
-        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 3, 5, 10, 15, 20]]
+        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10, 15, 20]]
+
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
