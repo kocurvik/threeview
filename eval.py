@@ -152,6 +152,7 @@ def eval_experiment(x):
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
         inner_refine = int(experiment[idx+2:idx + 2 + idx_end])
+        print(inner_refine)
 
 
     lo_iterations = 0 if '+ nLO' in experiment else 25
@@ -275,7 +276,7 @@ def eval(args):
                        '4p(HC)', '5p3v']
 
     if args.refine:
-        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 3, 5, 10, 15, 20, 25, 100]]
+        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 3, 5, 10, 15, 20]]
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
