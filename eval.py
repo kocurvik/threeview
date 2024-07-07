@@ -1,7 +1,6 @@
 import argparse
 import json
 import os
-import re
 # from multiprocessing.pool import ThreadPool as Pool
 from multiprocessing import Pool
 from time import perf_counter
@@ -10,12 +9,11 @@ import poselib
 import h5py
 import numpy as np
 import torch
-from matplotlib import pyplot as plt
 from prettytable import PrettyTable
 from tqdm import tqdm
 
-import utils.geometry
 from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers
+from utils.vis import draw_results
 
 
 def parse_args():
@@ -55,7 +53,7 @@ def get_camera_dicts(K_file_path):
 
     for key, v in K_file.items():
         K = np.array(v)
-        d[key] = {'model': 'PINHOLE', 'width': int(2 * K[0, 2]), 'height': int(2 * K[1,2]), 'params': [K[0, 0], K[1, 1], K[0, 2], K[1, 2]]}
+        d[key.replace('\\', '/')] = {'model': 'PINHOLE', 'width': int(2 * K[0, 2]), 'height': int(2 * K[1,2]), 'params': [K[0, 0], K[1, 1], K[0, 2], K[1, 2]]}
 
     return d
 
@@ -198,46 +196,6 @@ def eval_experiment(x):
     return result_dict
 
 
-def draw_results(results, experiments, iterations_list, scene=None, features=None):
-    plt.figure()
-
-    for experiment in experiments:
-        experiment_results = [x for x in results if x['experiment'] == experiment]
-
-        xs = []
-        ys = []
-
-        for iterations in iterations_list:
-            iter_results = [x for x in experiment_results if x['info']['iterations'] == iterations]
-            mean_runtime = np.mean([x['info']['runtime'] for x in iter_results])
-            errs = np.array([max(1/3 *(out['R_12_err'] + out['R_13_err'] + out['R_23_err']), 1/3 * (out['t_12_err'] + out['t_13_err'] + out['t_23_err'])) for out in iter_results])
-            # errs = np.array([max(0.5 *(out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err'])) for out in iter_results])
-            errs = np.array([r['P_err'] for r in iter_results])
-            errs[np.isnan(errs)] = 180
-            AUC10 = np.mean(np.array([np.sum(errs < t) / len(errs) for t in range(1, 11)]))
-
-            xs.append(mean_runtime)
-            ys.append(AUC10)
-
-        plt.semilogx(xs, ys, label=experiment, marker='*')
-
-    title = ''
-    if scene is not None:
-        title += f'Scene: {scene} \n'
-    if features is not None:
-        title += f'Matches: {features}\n'
-
-    title += f"Error: max(1/3 *(out['R_12_err'] + out['R_13_err'] + out['R_23_err']), 1/3 * (out['t_12_err'] + out['t_13_err'] + out['t_23_err'])"
-
-    plt.title(title, fontsize=8)
-
-
-    plt.xlabel('Mean runtime (ms)')
-    plt.ylabel('AUC@10$\\deg$')
-    plt.legend()
-    plt.show()
-
-
 def fix_ch_err(results):
     for out in results:
         out['Charalambos P_err'] = max(0.5 * (out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err']))
@@ -294,8 +252,8 @@ def eval(args):
         C_file = h5py.File(os.path.join(dataset_path, f'{args.feature_file}.h5'))
         triplets = get_triplets(os.path.join(dataset_path, f'{args.feature_file}.txt'))
 
-        R_dict = {k: np.array(v) for k, v in R_file.items()}
-        T_dict = {k: np.array(v) for k, v in T_file.items()}
+        R_dict = {k.replace('\\', '/'): np.array(v) for k, v in R_file.items()}
+        T_dict = {k.replace('\\', '/'): np.array(v) for k, v in T_file.items()}
         camera_dicts = get_camera_dicts(os.path.join(dataset_path, 'K.h5'))
 
         if args.first is not None:
@@ -369,7 +327,10 @@ def eval(args):
         with open(json_path, 'w') as f:
             json.dump(results, f, indent=4)
 
-    draw_results(results, experiments, iterations_list, scene=os.path.basename(dataset_path), features=matches_basename)
+    title = f'Scene: {os.path.basename(dataset_path)} \n'
+    title += f'Matches: {matches_basename}\n'
+
+    draw_results(results, experiments, iterations_list, title=title)
 
 if __name__ == '__main__':
     args = parse_args()

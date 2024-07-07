@@ -50,7 +50,7 @@ def create_gt_h5(cameras, images, out_dir, args):
 
     for img_id, img in images.items():
         camera = cameras[img.camera_id]
-        name = img.name.split('.')[0]
+        name = img.name.split('.')[0].replace('/', '\\')
         q = img.qvec
         t = img.tvec
         R = Rotation.from_quat([q[1], q[2], q[3], q[0]]).as_matrix()
