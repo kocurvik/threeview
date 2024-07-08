@@ -200,10 +200,6 @@ def fix_ch_err(results):
     for out in results:
         out['Charalambos P_err'] = max(0.5 * (out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err']))
 
-
-
-
-
 def eval(args):
     dataset_path = args.dataset_path
     matches_basename = os.path.basename(args.feature_file)
