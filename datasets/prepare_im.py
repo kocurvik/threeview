@@ -1,4 +1,5 @@
 import argparse
+import itertools
 import os
 import random
 from pathlib import Path
@@ -19,7 +20,7 @@ from utils.read_write_colmap import cam_to_K, read_model
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--num_samples', type=int, default=200)
+    parser.add_argument('-n', '--num_samples', type=int, default=None)
     parser.add_argument('-s', '--seed', type=int, default=100)
     parser.add_argument('-f', '--features', type=str, default='superpoint')
     parser.add_argument('-mf', '--max_features', type=int, default=2048)
@@ -178,9 +179,27 @@ def create_triplets(out_dir, cameras, images, pts, args):
 
     print("Writing matches to: ", h5_path)
 
-    with tqdm(total=args.num_samples) as pbar:
-        while output < args.num_samples:
-            img_ids = random.sample(list(images.keys()), 3)
+    id_list = list([k for k, v in images.items()])
+
+    if args.num_samples is None:
+        img_ids_list = list(itertools.combinations(id_list, 3))
+        total = len(img_ids_list)
+    else:
+        total = args.num_samples
+
+    all_counter = 0
+
+    with tqdm(total=total) as pbar:
+        while output < total:
+            if args.num_samples is not None:
+                img_ids = random.sample(list(images.keys()), 3)
+            else:
+                if all_counter >= len(img_ids_list):
+                    break
+                img_ids = img_ids_list[all_counter]
+                all_counter += 1
+                pbar.update(1)
+
             label = '-'.join([images[x].name.split('.')[0] for x in img_ids])
 
             if label in h5_file:
@@ -234,8 +253,10 @@ def create_triplets(out_dir, cameras, images, pts, args):
 
                 h5_file.create_dataset(label, shape=out_array.shape, data=out_array)
                 triplets.append(label.replace('-', ' '))
-                pbar.update(1)
-                output += 1
+
+                if args.num_samples is not None:
+                    pbar.update(1)
+                    output += 1
 
     triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.txt')
     print("Writing list of triplets to: ", triples_txt_path)
