@@ -1,5 +1,4 @@
 import numpy as np
-import cv2
 
 from theory.lo_verification import skew
 
@@ -91,28 +90,3 @@ def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ra
     x3 = add_rand_pts(x3, camera_dicts[img3], multiplier)
 
     return x1, x2, x3
-
-
-def pose_from_F(F, K1, K2, kp1, kp2):
-    try:
-        K1_inv = np.linalg.inv(K1)
-        K2_inv = np.linalg.inv(K2)
-
-        E = K2.T @(F @ K1)
-
-        # print(np.linalg.svd(E)[1])
-
-        kp1 = np.column_stack([kp1, np.ones(len(kp1))])
-        kp2 = np.column_stack([kp2, np.ones(len(kp1))])
-
-        kp1_unproj = (K1_inv @ kp1.T).T
-        kp1_unproj = kp1_unproj[:, :2] / kp1_unproj[:, 2, np.newaxis]
-        kp2_unproj = (K2_inv @ kp2.T).T
-        kp2_unproj = kp2_unproj[:, :2] / kp2_unproj[:, 2, np.newaxis]
-
-        _, R, t, mask = cv2.recoverPose(E, kp1_unproj, kp2_unproj)
-    except:
-        print("Pose exception!")
-        return np.eye(3), np.ones(3)
-
-    return R, t
