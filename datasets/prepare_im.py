@@ -251,6 +251,9 @@ def create_triplets(out_dir, cameras, images, pts, args):
                     score_23 = scores_23[idx_2]
                     out_array[i] = np.array([*point_1, *point_2, *point_3, score_12, score_13, score_23])
 
+                if len(idxs) < 10:
+                    continue
+
                 h5_file.create_dataset(label, shape=out_array.shape, data=out_array)
                 triplets.append(label.replace('-', ' '))
 
