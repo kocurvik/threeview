@@ -22,6 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num_samples', type=int, default=None)
     parser.add_argument('-s', '--seed', type=int, default=100)
+    parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-f', '--features', type=str, default='superpoint')
     parser.add_argument('-mf', '--max_features', type=int, default=2048)
     parser.add_argument('-r', '--resize', type=int, default=None)
@@ -174,14 +175,25 @@ def create_triplets(out_dir, cameras, images, pts, args):
     matcher = lightglue.LightGlue(features=args.features).eval().cuda()
     h5_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.h5')
     h5_file = h5py.File(h5_path, 'w')
+    print("Writing matches to: ", h5_path)
 
     triplets = []
 
-    print("Writing matches to: ", h5_path)
-
     id_list = list([k for k, v in images.items()])
+    inverse_id_list = {v.name.split('.')[0]: k for k,v in images.items()}
 
-    if args.num_samples is None:
+    if args.load:
+        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+        print("Using previous triplets from:", triples_txt_path)
+        with open(triples_txt_path, 'r') as f:
+            loaded_triplets = f.readlines()
+
+        total = len(loaded_triplets)
+        img_ids_list = []
+        for triplet in loaded_triplets:
+            name_1, name_2, name_3 = triplet.split('-')
+            img_ids_list.append((inverse_id_list[name_1], inverse_id_list[name_2], inverse_id_list[name_3]))
+    elif args.num_samples is None:
         img_ids_list = list(itertools.combinations(id_list, 3))
         total = len(img_ids_list)
     else:
