@@ -24,6 +24,7 @@ def parse_args():
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('-o', '--oracles', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
     parser.add_argument('feature_file')
@@ -230,7 +231,10 @@ def eval(args):
                        '4p(HC)', '5p3v', '4p3v(O)']
 
     if args.refine:
-        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10, 15, 20]]
+        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
+
+    if args.oracles:
+        experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
