@@ -309,7 +309,7 @@ def eval(args):
                     xx2 = ((K1 @ K2_inv) @ xx2.T).T
                     x2 = xx2[:, :2] / xx2[:, 2:]
 
-                    xx3 = ((K1 @ K2_inv) @ xx3.T).T
+                    xx3 = ((K1 @ K3_inv) @ xx3.T).T
                     x3 = xx3[:, :2] / xx3[:, 2:]
 
                 R_dict_l = {x: R_dict[x] for x in [img1, img2, img3]}
