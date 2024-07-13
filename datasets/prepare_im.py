@@ -21,6 +21,7 @@ from utils.read_write_colmap import cam_to_K, read_model
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num_samples', type=int, default=None)
+    parser.add_argument('-a', '--area', type=float, default=None)
     parser.add_argument('-s', '--seed', type=int, default=100)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-f', '--features', type=str, default='superpoint')
@@ -173,7 +174,12 @@ def create_triplets(out_dir, cameras, images, pts, args):
     features = torch.load(os.path.join(out_dir, f"{get_matcher_string(args)}.pt"))
 
     matcher = lightglue.LightGlue(features=args.features).eval().cuda()
-    h5_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.h5')
+
+    if args.area is not None:
+        h5_path_str = f'triplets-a{args.area}-{get_matcher_string(args)}-LG.h5'
+    else:
+        h5_path_str = f'triplets-{get_matcher_string(args)}-LG.h5'
+    h5_path = os.path.join(out_dir, h5_path_str)
     h5_file = h5py.File(h5_path, 'w')
     print("Writing matches to: ", h5_path)
 
@@ -217,8 +223,9 @@ def create_triplets(out_dir, cameras, images, pts, args):
             if label in h5_file:
                 continue
 
+            min_area = 0.1 if args.area is None else args.area
             area_1, area_2, area_3 = get_overlap_areas(cameras, images, pts, img_ids)
-            if area_1 > 0.1 and area_2 > 0.1 and area_3 > 0.1:
+            if min_area > 0.1 and min_area > 0.1 and area_3 > min_area:
                 img_1, img_2, img_3 = (images[x] for x in img_ids)
 
                 feats_1 = features[img_1.name.split(".")[0]]
@@ -354,7 +361,10 @@ def create_triplets_loftr(out_dir, img_path, cameras, images, pts, args):
                 pbar.update(1)
                 output += 1
 
-    triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+    if args.area is None:
+        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+    else:
+        triples_txt_path = os.path.join(out_dir, f'triplets-a{args.area}-{get_matcher_string(args)}.txt')
     print("Writing list of triplets to: ", triples_txt_path)
     with open(triples_txt_path, 'w') as f:
         f.writelines(line + '\n' for line in triplets)
