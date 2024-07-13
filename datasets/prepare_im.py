@@ -183,7 +183,7 @@ def create_triplets(out_dir, cameras, images, pts, args):
     inverse_id_list = {v.name.split('.')[0]: k for k,v in images.items()}
 
     if args.load:
-        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.txt')
         print("Using previous triplets from:", triples_txt_path)
         with open(triples_txt_path, 'r') as f:
             loaded_triplets = f.readlines()
