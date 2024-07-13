@@ -230,7 +230,7 @@ def eval(args):
     basename = os.path.basename(dataset_path)
     if args.graph:
         basename = f'{basename}-graph'
-        iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
+        iterations_list = [100] #, 200, 500, 1000, 2000, 5000, 10000]
         # iterations_list = [20000, 50000]
     else:
         iterations_list = [None]
