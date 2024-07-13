@@ -416,6 +416,9 @@ def get_dataset_paths(basename, dataset_path, subset):
     elif 'multiview_undistorted' in basename.lower() or 'eth3d' in basename.lower():
         model_path = os.path.join(subset_path, 'dslr_calibration_undistorted')
         img_path = os.path.join(subset_path, 'images')
+    elif 'cambridge' in basename.lower():
+        model_path = os.path.join(subset_path, 'model_train')
+        img_path = os.path.join(subset_path, subset)
     else:
         model_path = os.path.join(subset_path, 'sfm')
         img_path = os.path.join(subset_path, 'images_full')
