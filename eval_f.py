@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
+    parser.add_argument('-s', '--synth', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('-o', '--oracles', action='store_true', default=False)
@@ -159,7 +160,7 @@ def eval_experiment(x):
     oracle = '(O)' in experiment
 
     # using R
-    inner_refine = 10 if '+ R' in experiment else 0
+    inner_refine = 2 if '+ R' in experiment else 0
     if '+ R(' in experiment:
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
@@ -213,6 +214,14 @@ def eval_experiment(x):
     #     json.dump(result_dict, f)
 
     return result_dict
+
+
+def get_K(camera_dicts, img1):
+    pp = np.array(camera_dicts[img1]['params'][-2:])
+    focal = np.array(camera_dicts[img1]['params'][0])
+    K = np.diag([focal, focal, 1])
+    K[:2, 2] = pp
+    return K
 
 
 def eval(args):
@@ -288,6 +297,20 @@ def eval(args):
                 x1 = pts[l, 0:2]
                 x2 = pts[l, 2:4]
                 x3 = pts[l, 4:6]
+
+                if args.synth:
+                    K1 = get_K(camera_dicts, img1)
+                    K2_inv = np.linalg.inv(get_K(camera_dicts, img2))
+                    K3_inv = np.linalg.inv(get_K(camera_dicts, img3))
+
+                    xx2 = np.column_stack(x1, np.ones(len(x2)))
+                    xx3 = np.column_stack(x1, np.ones(len(x3)))
+
+                    xx2 = ((K1 @ K2_inv) @ xx2.T).T
+                    x2 = xx2[:, :2] / xx2[:, 2:]
+
+                    xx3 = ((K1 @ K2_inv) @ xx3.T).T
+                    x3 = xx3[:, :2] / xx3[:, 2:]
 
                 R_dict_l = {x: R_dict[x] for x in [img1, img2, img3]}
                 T_dict_l = {x: T_dict[x] for x in [img1, img2, img3]}
