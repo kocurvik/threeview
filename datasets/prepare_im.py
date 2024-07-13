@@ -225,7 +225,7 @@ def create_triplets(out_dir, cameras, images, pts, args):
 
             min_area = 0.1 if args.area is None else args.area
             area_1, area_2, area_3 = get_overlap_areas(cameras, images, pts, img_ids)
-            if min_area > 0.1 and min_area > 0.1 and area_3 > min_area:
+            if area_1 > min_area and area_2 > min_area and area_3 > min_area:
                 img_1, img_2, img_3 = (images[x] for x in img_ids)
 
                 feats_1 = features[img_1.name.split(".")[0]]
@@ -280,7 +280,10 @@ def create_triplets(out_dir, cameras, images, pts, args):
                     pbar.update(1)
                     output += 1
 
-    triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.txt')
+    if args.area is None:
+        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+    else:
+        triples_txt_path = os.path.join(out_dir, f'triplets-a{args.area}-{get_matcher_string(args)}.txt')
     print("Writing list of triplets to: ", triples_txt_path)
     with open(triples_txt_path, 'w') as f:
         f.writelines(line + '\n' for line in triplets)
