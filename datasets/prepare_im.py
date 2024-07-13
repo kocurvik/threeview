@@ -198,7 +198,9 @@ def create_triplets(out_dir, cameras, images, pts, args):
         img_ids_list = []
         for triplet in loaded_triplets:
             name_1, name_2, name_3 = triplet.strip().split(' ')
-            img_ids_list.append((inverse_id_list[name_1], inverse_id_list[name_2], inverse_id_list[name_3]))
+            img_ids_list.append((inverse_id_list[name_1.split('.')[0]],
+                                 inverse_id_list[name_2.split('.')[0]],
+                                 inverse_id_list[name_3.split('.')[0]]))
     elif args.num_samples is None:
         img_ids_list = list(itertools.combinations(id_list, 3))
         total = len(img_ids_list)
