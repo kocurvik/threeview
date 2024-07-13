@@ -303,8 +303,8 @@ def eval(args):
                     K2_inv = np.linalg.inv(get_K(camera_dicts, img2))
                     K3_inv = np.linalg.inv(get_K(camera_dicts, img3))
 
-                    xx2 = np.column_stack(x1, np.ones(len(x2)))
-                    xx3 = np.column_stack(x1, np.ones(len(x3)))
+                    xx2 = np.column_stack([x2, np.ones(len(x2))])
+                    xx3 = np.column_stack([x3, np.ones(len(x3))])
 
                     xx2 = ((K1 @ K2_inv) @ xx2.T).T
                     x2 = xx2[:, :2] / xx2[:, 2:]
