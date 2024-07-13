@@ -159,7 +159,7 @@ def eval_experiment(x):
     oracle = '(O)' in experiment
 
     # using R
-    inner_refine = 2 if '+ R' in experiment else 0
+    inner_refine = 10 if '+ R' in experiment else 0
     if '+ R(' in experiment:
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
