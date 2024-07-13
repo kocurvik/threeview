@@ -281,9 +281,9 @@ def create_triplets(out_dir, cameras, images, pts, args):
                     output += 1
 
     if args.area is None:
-        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}.txt')
+        triples_txt_path = os.path.join(out_dir, f'triplets-{get_matcher_string(args)}-LG.txt')
     else:
-        triples_txt_path = os.path.join(out_dir, f'triplets-a{args.area}-{get_matcher_string(args)}.txt')
+        triples_txt_path = os.path.join(out_dir, f'triplets-a{args.area}-{get_matcher_string(args)}-LG.txt')
     print("Writing list of triplets to: ", triples_txt_path)
     with open(triples_txt_path, 'w') as f:
         f.writelines(line + '\n' for line in triplets)
