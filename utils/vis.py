@@ -120,7 +120,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type):
+def generate_graphs(dataset, results_type, all=True):
     basenames = get_basenames(dataset)
 
     # results_type = 'graph-SIFT_triplet_correspondences'
@@ -130,21 +130,24 @@ def generate_graphs(dataset, results_type):
         json_path = os.path.join('results', f'{basename}-{results_type}.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
-            results.extend(json.load(f))
-            # results = json.load(f)
+            if all:
+                results.extend(json.load(f))
+            else:
+                results = json.load(f)
+                draw_results_pose_auc_10(results, experiments, iterations_list, f'{dataset}_{basename}_{results_type}')
 
-        # draw_results_pose_auc_10(results, experiments, iterations_list, f'{dataset}_{basename}_{results_type}')
-
-    title = f'{dataset}_{results_type}'
-    draw_results_pose_auc_10(results, experiments, iterations_list, title)
+    if all:
+        title = f'{dataset}_{results_type}'
+        draw_results_pose_auc_10(results, experiments, iterations_list, title)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 
 if __name__ == '__main__':
-    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG')
-    generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG')
+    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=False)
+    # generate_graphs('pt', 'graph-0.4inliers-triplets-features_superpoint_noresize_2048-LG', all=False)
+    # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('urban', 'graph-triplets-features_superpoint_noresize_2048-LG')
     # generate_graphs('pt', 'graph-triplets-features_loftr_1024_0')
     # generate_graphs('eth3d', 'graph-triplets-features_superpoint_1600_2048-LG')
     # generate_graphs('eth3d', 'graph-triplets-a0.4-features_superpoint_noresize_2048-LG')
-    # generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG')
+    generate_graphs('aachen', 'graph-triplets-a0.4-features_superpoint_noresize_2048-LG')
