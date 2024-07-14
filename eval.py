@@ -243,7 +243,8 @@ def eval(args):
 
     if args.delta:
         # samples = [0.1, 0.05, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001, 0.0005]
-        samples = [0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.005]
+        # samples = [0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.005]
+        samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
         experiments = [f'4p3v(M+D({x}))' for x in samples]
         experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
         experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
