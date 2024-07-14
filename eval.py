@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
+    parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('-o', '--oracles', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
@@ -151,7 +152,6 @@ def eval_experiment(x):
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
         inner_refine = int(experiment[idx+2:idx + 2 + idx_end])
-        print(inner_refine)
 
 
     lo_iterations = 0 if '+ nLO' in experiment else 25
@@ -164,6 +164,11 @@ def eval_experiment(x):
             delta = 0.006
     else:
         delta = 0
+
+    if 'D(' in experiment:
+        idx = experiment.find('D(')
+        idx_end = experiment[idx+2:].find(')')
+        delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
     ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
@@ -235,6 +240,12 @@ def eval(args):
 
     if args.oracles:
         experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
+
+    if args.delta:
+        samples = [0.5, 0.1, 0.05, 0.025, 0.0125, 0.006, 0.003, 0.001]
+        experiments = [f'4p3v(M+D({x}))' for x in samples]
+        experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
+        experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
