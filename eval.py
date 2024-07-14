@@ -142,7 +142,7 @@ def eval_experiment(x):
     experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
 
     use_net = '(L)' in experiment or '(L+D)' in experiment
-    init_net = '(L+ID)' in experiment
+    init_net = '(L-ID)' in experiment
     use_hc = 'HC' in experiment
     threeview_check = '+ C' in experiment
     oracle = '(O)' in experiment
@@ -238,11 +238,9 @@ def eval(args):
 
     if args.fix_delta:
         if args.all:
-            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
-                           '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
-                           '4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C']
+            experiments = ['4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C']
         else:
-            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C']
+            experiments = []
 
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
