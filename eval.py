@@ -225,15 +225,19 @@ def eval(args):
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
     if args.all:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
+                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
-                       '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C', '4p3v(L+D) + C',
+                       '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
                        '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+        experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
+                       '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
+                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
+                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+        experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C']
 
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
@@ -242,9 +246,7 @@ def eval(args):
         experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
 
     if args.delta:
-        # samples = [0.1, 0.05, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001, 0.0005]
-        # samples = [0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.005]
-        samples = [0.09, 0.07, 0.03]
+        samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
         experiments = [f'4p3v(M+D({x}))' for x in samples]
         experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
         experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
