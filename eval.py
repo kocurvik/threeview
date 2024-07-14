@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
+    parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('-o', '--oracles', action='store_true', default=False)
@@ -159,9 +160,9 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.006
+            delta = 0.04
         else:
-            delta = 0.006
+            delta = 0.04
     else:
         delta = 0
 
@@ -228,16 +229,20 @@ def eval(args):
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
                        '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
-                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C',
+                       '4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
-        experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
-                       '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
-                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
-        experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C']
+
+    if args.fix_delta:
+        if args.all:
+            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
+                           '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
+                           '4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C']
+        else:
+            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C']
 
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
