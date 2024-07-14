@@ -154,7 +154,7 @@ def eval_experiment(x):
     experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
 
     use_net = '(L)' in experiment or '(L+D)' in experiment
-    init_net = '(L+ID)' in experiment
+    init_net = '(L-ID)' in experiment
     use_hc = 'HC' in experiment
     threeview_check = '+ C' in experiment
     oracle = '(O)' in experiment
@@ -173,9 +173,9 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.006
+            delta = 0.04
         else:
-            delta = 0.006
+            delta = 0.04
     else:
         delta = 0
 
@@ -243,14 +243,14 @@ def eval(args):
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(M) + C', '4p3v(M+D) + C', '5p3v']
     if args.all:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
+                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
-                       '4p3v(L+D)', '4p3v(L+D) + R', '4p3v(L+D) + R + C', '4p3v(L+D) + C',
-                       '4p3v(L+ID)', '4p3v(L+ID) + R', '4p3v(L+ID) + R + C', '4p3v(L+ID) + C',
+                       '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
+                       '4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C',
                        '6p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
-                       '4p3v(M+D)', '4p3v(M+D) + R', '4p3v(M+D) + R + C', '4p3v(M+D) + C',
+                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '6p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
 
     if args.refine:
@@ -258,6 +258,14 @@ def eval(args):
 
     if args.oracles:
         experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
+
+    if args.fix_delta:
+        if args.all:
+            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
+                           '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
+                           '4p3v(L-ID)', '4p3v(L-ID) + R', '4p3v(L-ID) + R + C', '4p3v(L-ID) + C']
+        else:
+            experiments = ['4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C']
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
