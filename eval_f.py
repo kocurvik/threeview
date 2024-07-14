@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
+    parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-s', '--synth', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
