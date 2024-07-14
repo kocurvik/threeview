@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-s', '--synth', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
+    parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('-o', '--oracles', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
@@ -180,6 +181,11 @@ def eval_experiment(x):
     else:
         delta = 0
 
+    if 'D(' in experiment:
+        idx = experiment.find('D(')
+        idx_end = experiment[idx+2:].find(')')
+        delta = float(experiment[idx+2:idx + 2 + idx_end])
+
     num_pts = int(experiment[0])
     ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
@@ -259,6 +265,12 @@ def eval(args):
 
     if args.oracles:
         experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
+
+    if args.delta:
+        samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
+        experiments = [f'4p3v(M-D({x}))' for x in samples]
+        experiments.extend([f'4p3v(M-D({x})) + R' for x in samples])
+        experiments.extend([f'4p3v(M-D({x})) + R + C' for x in samples])
 
     if args.fix_delta:
         if args.all:
