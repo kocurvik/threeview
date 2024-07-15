@@ -186,8 +186,8 @@ def run_synth():
 
     ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
                    'min_iterations': 100, 'max_iterations': 10000, 'lo_iterations': 25,
-                   'inner_refine': False, 'threeview_check': True, 'sample_sz': 5,
-                   'delta': 0.025, 'use_hc': False}
+                   'inner_refine': False, 'threeview_check': True, 'sample_sz': 4,
+                   'delta': 0.05, 'use_hc': False}
 
     # pose, out5 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
     # print("Rot errs 5p")
@@ -206,17 +206,19 @@ def run_synth():
     ransac_dict['sample_sz'] = 4
     ransac_dict['gt_E'] = skew(t12) @ R12
     print(ransac_dict['gt_E'])
-    pose, outR = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
+    pp = np.array([0, 0])
+    out, outR = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, pp, ransac_dict, {'verbose': False})
+    pose = out.poses
     # if (angle(pose.pose23().t, t23) > 1):
-    print("Rot errs L")
-    print(rotation_angle(pose.pose12.R.T @ R12))
-    print(rotation_angle(pose.pose13.R.T @ R13))
-    print(rotation_angle(pose.pose23().R.T @ R23))
-
-    print(angle(pose.pose12.t, t12))
-    print(angle(pose.pose13.t, t13))
-    print(angle(pose.pose23().t, t23))
-    print(outR['num_inliers'])
+    # print("Rot errs L")
+    # print(rotation_angle(pose.pose12.R.T @ R12))
+    # print(rotation_angle(pose.pose13.R.T @ R13))
+    # print(rotation_angle(pose.pose23().R.T @ R23))
+    #
+    # print(angle(pose.pose12.t, t12))
+    # print(angle(pose.pose13.t, t13))
+    # print(angle(pose.pose23().t, t23))
+    # print(outR['num_inliers'])
 
     # return out5['iterations'], out4['iterations'], outR['iterations']
     return
