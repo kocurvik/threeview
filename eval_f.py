@@ -167,7 +167,7 @@ def eval_experiment(x):
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
         inner_refine = int(experiment[idx+2:idx + 2 + idx_end])
-        print(inner_refine)
+        # print(inner_refine)
 
 
     lo_iterations = 0 if '+ nLO' in experiment else 25
