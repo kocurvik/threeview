@@ -261,7 +261,7 @@ def eval(args):
                        '6p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
 
     if args.refine:
-        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
+        experiments = [f'4p3v(M) + R({x}) + C' for x in [20, 30, 40, 50, 100, 200]]
 
     if args.oracles:
         experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
