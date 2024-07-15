@@ -187,7 +187,7 @@ def eval_experiment(x):
         delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 5.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 3.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
