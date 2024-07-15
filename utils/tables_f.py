@@ -11,8 +11,8 @@ incdec = [1, 1, -1, -1, -1, 1]
 experiments = ['6p3v',
                '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p3v(L)', '4p3v(L) + R', #'4p3v(L-ID) + R',
-               '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+               '4p3v(L)', '4p3v(L) + R', '4p3v(L-ID) + R',
+               '4p3v(O)', '4p3v(O) + R']
 
 names = {
         '4p(HC)' : '\\sshc',
