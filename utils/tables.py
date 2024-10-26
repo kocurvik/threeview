@@ -12,6 +12,7 @@ experiments = ['4p(HC)', '5p3v',
                '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
                '4p3v(L)', '4p3v(L) + R', '4p3v(L--ID) + R',
+               '4p3v(A)', '3p3v(A)', '2p3v(A)',
                '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
 
 names = {
@@ -32,6 +33,9 @@ names = {
         '4p3v(L--ID)': '\\midrule\\sftlid',
         '4p3v(L--ID) + R': '\\sftlidR',
         '4p3v(L--ID) + R + C': '\\sftlidRC',
+        '4p3v(A)' : '\\midrule\\sfaf',
+        '3p3v(A)' : '\\midrule\\sfah',
+        '2p3v(A)' : '\\midrule\\sfae',
         '4p3v(O)': '\\midrule\\sfto',
         '4p3v(O) + R': '\\sftoR',
         '4p3v(O) + R + C': '\\sftoRC',
@@ -167,7 +171,7 @@ def generate_delta_table():
 
 
 if __name__ == '__main__':
-    # generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
+    generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
     # generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=True)
-    generate_delta_table()
+    # generate_delta_table()
 
