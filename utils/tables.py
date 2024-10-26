@@ -172,6 +172,6 @@ def generate_delta_table():
 
 if __name__ == '__main__':
     generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
-    # generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=True)
+    generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=True)
     # generate_delta_table()
 
