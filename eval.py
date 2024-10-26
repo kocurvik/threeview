@@ -13,7 +13,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 
 from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers
-from utils.vis import draw_results
+from utils.vis import draw_results, draw_results_pose_portion
 
 
 def parse_args():
@@ -26,6 +26,7 @@ def parse_args():
     parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('--affine', action='store_true', default=False)
     parser.add_argument('-o', '--oracles', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
@@ -146,6 +147,7 @@ def eval_experiment(x):
     use_hc = 'HC' in experiment
     threeview_check = '+ C' in experiment
     oracle = '(O)' in experiment
+    affine = '(A)' in experiment
 
     # using R
     inner_refine = 2 if '+ R' in experiment else 0
@@ -175,7 +177,8 @@ def eval_experiment(x):
     ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
-                   'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
+                   'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
+                   'use_affine': affine}
 
     if iterations is not None:
         ransac_dict['min_iterations'] = iterations
@@ -230,11 +233,13 @@ def eval(args):
                        '4p3v(L)', '4p3v(L) + R', '4p3v(L) + R + C', '4p3v(L) + C',
                        '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
                        '4p3v(L--ID)', '4p3v(L--ID) + R', '4p3v(L--ID) + R + C', '4p3v(L--ID) + C',
-                       '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+                       '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
+                       '4p3v(A)', '3p3v(A)', '2p3v(A)']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
-                       '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+                       '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
+                       '4p3v(A)', '3p3v(A)', '2p3v(A)']
 
     if args.fix_delta:
         if args.all:
@@ -253,6 +258,10 @@ def eval(args):
         experiments = [f'4p3v(M+D({x}))' for x in samples]
         experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
         experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
+
+    if args.affine:
+        experiments = ['4p3v(A)', '3p3v(A)', '2p3v(A)']
+
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
@@ -349,6 +358,7 @@ def eval(args):
     title += f'Matches: {matches_basename}\n'
 
     draw_results(results, experiments, iterations_list, title=title)
+    draw_results_pose_portion(results, experiments, iterations_list)
 
 if __name__ == '__main__':
     args = parse_args()
