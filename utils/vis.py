@@ -212,9 +212,9 @@ def generate_refinement_graph():
 
 if __name__ == '__main__':
     # generate_outliers()
-    generate_refinement_graph()
-    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
-    # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    # generate_refinement_graph()
+    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('pt', 'graph-0.4inliers-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)

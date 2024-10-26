@@ -2,12 +2,18 @@ import seaborn as sns
 
 experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p(HC)', '5p3v', '4p3v(O) + R + C']
+               '4p(HC)', '5p3v', '4p3v(O) + R + C',
+               '4p3v(A)', '3p3v(A)', '2p3v(A)']
 
 iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
-colors = {exp: sns.color_palette("tab10")[i] for i, exp in enumerate(experiments)}
+# colors = {exp: sns.color_palette("tab10")[i] for i, exp in enumerate(experiments)}
+colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
+print('******')
+print('Color palette:')
+print(sns.color_palette("hls", len(experiments)).as_hex())
+
 styles = {exp: 'dashed' if 'O' in exp else 'solid' for exp in experiments}
-colors[experiments[7]] = sns.color_palette("tab10")[9]
+# colors[experiments[7]] = sns.color_palette("tab10")[9]
 
 basenames_pt = ['brandenburg_gate', 'buckingham_palace', 'colosseum_exterior', 'grand_place_brussels',
                 'notre_dame_front_facade', 'palace_of_westminster', 'pantheon_exterior', 'reichstag', #'st_peters_square',
