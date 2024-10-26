@@ -96,7 +96,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         iter_results = experiment_results
         mean_runtime = np.mean([x['info']['runtime'] for x in iter_results])
         # errs = np.array([max(0.5 * (out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err'])) for out in iter_results])
-        errs = np.array([out['R_23_err'] for out in iter_results])
+        errs = np.array([out['t_13_err'] for out in iter_results])
         # errs = np.array([0.5 * (out['t_12_err'] + out['t_13_err']) for out in iter_results])
         errs[np.isnan(errs)] = 180
         cum_err = np.array([np.sum(errs < t) / len(errs) for t in range(1, 181)])
@@ -106,11 +106,12 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         xs = np.arange(1, 181)
         ys = cum_err
 
-        plt.plot(xs, ys, label=experiment, marker='*', color=colors[experiment])
+        # plt.plot(xs, ys, label=experiment, marker='*', color=colors[experiment])
+        plt.plot(xs, ys, label=experiment, marker='*')
 
     # plt.xlim([5.0, 1.9e4])
-    plt.xlabel('Mean runtime (ms)', fontsize=large_size)
-    plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
+    plt.xlabel('Pose error', fontsize=large_size)
+    plt.ylabel('Portion of samples', fontsize=large_size)
     plt.tick_params(axis='x', which='major', labelsize=small_size)
     plt.tick_params(axis='y', which='major', labelsize=small_size)
     if title is not None:
