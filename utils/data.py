@@ -1,6 +1,7 @@
 import seaborn as sns
 
 experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+               '4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
                '4p(HC)', '5p3v', '4p3v(O) + R + C',
                '4p3v(A)', '3p3v(A)', '2p3v(A)']
