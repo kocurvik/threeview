@@ -26,8 +26,8 @@ def parse_args():
     parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('-o', '--overwrite', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
-    parser.add_argument('-o', '--oracles', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
     parser.add_argument('feature_file')
@@ -250,9 +250,6 @@ def eval(args):
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
 
-    if args.oracles:
-        experiments = ['4p3v(O) + R', '4p3v(O) + R + C']
-
     if args.delta:
         samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
         experiments = [f'4p3v(M+D({x}))' for x in samples]
@@ -260,7 +257,8 @@ def eval(args):
         experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
 
     if args.affine:
-        experiments = ['4p3v(A)', '3p3v(A)', '2p3v(A)']
+        # experiments = ['4p3v(A)', '3p3v(A)', '2p3v(A)']
+        experiments = ['3p3v(A)']
 
 
     # experiments.extend([x + ' + C' for x in experiments])
@@ -334,6 +332,10 @@ def eval(args):
         print(f"Appending from: {json_path}")
         with open(json_path, 'r') as f:
             prev_results = json.load(f)
+
+        if args.overwrite:
+            prev_results = [x for x in prev_results if x['experiment'] not in experiments]
+
         results.extend(prev_results)
 
     fix_ch_err(results)
