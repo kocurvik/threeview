@@ -3,7 +3,7 @@ import seaborn as sns
 experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
                '4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p(HC)', '5p3v', '4p3v(O) + R + C',
+               '4p(HC)', '5p3v', '5p3v + ENM', '5p3v + ELM', '4p3v(O) + R + C',
                '4p3v(A)', '3p3v(A)', '2p3v(A)']
 
 iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]

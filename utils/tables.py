@@ -18,6 +18,8 @@ experiments = ['4p(HC)', '5p3v',
 names = {
         '4p(HC)' : '\\sfhc~\\cite{Hruby_cvpr2022}',
         '5p3v': '\\midrule\\sft',
+        '5p3v + ENM': '\\midrule\\sftnm',
+        '5p3v + ELM': '\\midrule\\sftlm',
         '4p3v(M)': '\\midrule\\sftm',
         '4p3v(M) + R': '\\sftmR',
         '4p3v(M) + R + C': '\\sftmRC',
