@@ -266,7 +266,7 @@ def eval(args):
 
     if args.early:
         # experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM']
-        experiments = ['5p3v(M) + ENM', '5p3v(M) + ELM']
+        experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '5p3v(M) + ELM']
 
 
     # experiments.extend([x + ' + C' for x in experiments])
