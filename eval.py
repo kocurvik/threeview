@@ -12,7 +12,7 @@ import torch
 from prettytable import PrettyTable
 from tqdm import tqdm
 
-from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers
+from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers, get_camera_dicts
 from utils.vis import draw_results, draw_results_pose_portion
 
 
@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
+    parser.add_argument('-p', '--para', action='store_true', default=False)
     parser.add_argument('-fd', '--fix_delta', action='store_true', default=False)
     parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
@@ -36,31 +37,6 @@ def parse_args():
 
     return parser.parse_args()
 
-
-def get_camera_dicts(K_file_path):
-    K_file = h5py.File(K_file_path)
-
-    d = {}
-
-    # Treat data from Charalambos differently since it is in pairs
-    if 'K1_K2' in K_file_path:
-
-        for k, v in K_file.items():
-            key1, key2 = k.split('-')
-            if key1 not in d.keys():
-                K1 = np.array(v)[0, 0]
-                d[key1] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K1[0, 2]), 'height': int(2 * K1[1,2]), 'params': [K1[0, 0], K1[0, 2], K1[1, 2]]}
-            if key2 not in d.keys():
-                K2 = np.array(v)[0, 1]
-                d[key2] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K2[0, 2]), 'height': int(2 * K2[1,2]), 'params': [K2[0, 0], K2[0, 2], K2[1, 2]]}
-
-        return d
-
-    for key, v in K_file.items():
-        K = np.array(v)
-        d[key.replace('\\', '/')] = {'model': 'PINHOLE', 'width': int(2 * K[0, 2]), 'height': int(2 * K[1,2]), 'params': [K[0, 0], K[1, 1], K[0, 2], K[1, 2]]}
-
-    return d
 
 def get_triplets(txt_path):
     with open(txt_path, 'r') as f:
@@ -149,6 +125,7 @@ def eval_experiment(x):
     threeview_check = '+ C' in experiment
     oracle = '(O)' in experiment
     affine = '(A)' in experiment
+    use_para = '(P)' in experiment
     early_lm = '+ ELM' in experiment
     early_nm = '+ ENM' in experiment
 
@@ -177,11 +154,11 @@ def eval_experiment(x):
         delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 10.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
-                   'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm}
+                   'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para}
 
     if iterations is not None:
         ransac_dict['min_iterations'] = iterations
@@ -267,6 +244,11 @@ def eval(args):
     if args.early:
         # experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM']
         experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '5p3v(M) + ELM']
+
+    if args.para:
+        experiments = ['4p3v(P)']
+
+    experiments = ['4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
 
     # experiments.extend([x + ' + C' for x in experiments])

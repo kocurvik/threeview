@@ -1,3 +1,4 @@
+import h5py
 import numpy as np
 
 from theory.lo_verification import skew
@@ -90,3 +91,29 @@ def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ra
     x3 = add_rand_pts(x3, camera_dicts[img3], multiplier)
 
     return x1, x2, x3
+
+
+def get_camera_dicts(K_file_path):
+    K_file = h5py.File(K_file_path)
+
+    d = {}
+
+    # Treat data from Charalambos differently since it is in pairs
+    if 'K1_K2' in K_file_path:
+
+        for k, v in K_file.items():
+            key1, key2 = k.split('-')
+            if key1 not in d.keys():
+                K1 = np.array(v)[0, 0]
+                d[key1] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K1[0, 2]), 'height': int(2 * K1[1,2]), 'params': [K1[0, 0], K1[0, 2], K1[1, 2]]}
+            if key2 not in d.keys():
+                K2 = np.array(v)[0, 1]
+                d[key2] = {'model': 'SIMPLE_PINHOLE', 'width': int(2 * K2[0, 2]), 'height': int(2 * K2[1,2]), 'params': [K2[0, 0], K2[0, 2], K2[1, 2]]}
+
+        return d
+
+    for key, v in K_file.items():
+        K = np.array(v)
+        d[key.replace('\\', '/')] = {'model': 'PINHOLE', 'width': int(2 * K[0, 2]), 'height': int(2 * K[1,2]), 'params': [K[0, 0], K[1, 1], K[0, 2], K[1, 2]]}
+
+    return d

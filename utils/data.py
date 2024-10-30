@@ -35,6 +35,8 @@ def err_fun_main(out):
 def err_fun_max(out):
     return max([out['R_12_err'], out['R_13_err'], out['R_23_err'], out['t_12_err'], out['t_13_err'], out['t_23_err']])
 
+def err_twoview(out):
+    return max([out['R_err'], out['t_err']])
 
 def get_basenames(dataset):
     if dataset == 'pt':
