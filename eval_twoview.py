@@ -67,8 +67,8 @@ def eval_experiment(x):
     sample_sz = int(experiment[0])
 
     if iters is None:
-        ransac_dict = {'max_iterations': 10000, 'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                       'min_iterations': 100, 'lo_iterations': 25, 'sample_sz': sample_sz}
+        ransac_dict = {'max_iterations': 5000, 'max_epipolar_error': 2.0, 'progressive_sampling': False,
+                       'min_iterations': 50, 'lo_iterations': 25, 'sample_sz': sample_sz}
     else:
         ransac_dict = {'max_iterations': iters, 'max_epipolar_error': 2.0, 'progressive_sampling': False,
                        'min_iterations': iters, 'sample_sz': sample_sz}
@@ -88,8 +88,8 @@ def eval_experiment(x):
     ransac_dict['delta'] = delta
 
     # ransac_dict['nonminimal_refinement'] = 'nonminimal' in experiment
-    ransac_dict['lo_iterations'] = 0 if 'noLO' in experiment else 25
-    bundle_dict = {'max_iterations': 0 if 'noLO' in experiment else 100}
+    ransac_dict['lo_iterations'] = 0 if 'nLO' in experiment else 25
+    bundle_dict = {'max_iterations': 0 if 'nLO' in experiment else 100}
 
     camera1 = {'model': 'PINHOLE', 'width': -1, 'height': -1, 'params': [K1[0, 0], K1[1, 1], K1[0, 2], K1[1, 2]]}
     camera2 = {'model': 'PINHOLE', 'width': -1, 'height': -1, 'params': [K2[0, 0], K2[1, 1], K2[0, 2], K2[1, 2]]}
