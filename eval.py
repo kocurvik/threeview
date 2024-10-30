@@ -154,7 +154,7 @@ def eval_experiment(x):
         delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 10.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
@@ -221,7 +221,8 @@ def eval(args):
                        '4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
-                       '4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
+                       '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
+                       '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
     if args.fix_delta:
         if args.all:
@@ -239,7 +240,8 @@ def eval(args):
         experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
 
     if args.affine:
-        experiments = ['4p3v(A)', '3p3v(A)', '2p3v(A)']
+        experiments = ['4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + R + C',
+                       '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
     if args.early:
         # experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM']
