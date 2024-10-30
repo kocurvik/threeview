@@ -215,13 +215,13 @@ def eval(args):
                        '4p3v(L-D)', '4p3v(L-D) + R', '4p3v(L-D) + R + C', '4p3v(L-D) + C',
                        '4p3v(L--ID)', '4p3v(L--ID) + R', '4p3v(L--ID) + R + C', '4p3v(L--ID) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
-                       '4p3v(A)', '3p3v(A)', '2p3v(A)']
+                       '4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
-                       '4p3v(A)', '3p3v(A)', '2p3v(A)']
+                       '4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
     if args.fix_delta:
         if args.all:
@@ -247,8 +247,6 @@ def eval(args):
 
     if args.para:
         experiments = ['4p3v(P)']
-
-    experiments = ['4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
 
     # experiments.extend([x + ' + C' for x in experiments])
