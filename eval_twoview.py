@@ -62,15 +62,14 @@ def get_result_dict(info, pose_est, R_gt, t_gt):
 
 def eval_experiment(x):
     iters, experiment, kp1, kp2, R_gt, t_gt, K1, K2 = x
-    print(experiment)
 
     sample_sz = int(experiment[0])
 
     if iters is None:
-        ransac_dict = {'max_iterations': 5000, 'max_epipolar_error': 2.0, 'progressive_sampling': False,
+        ransac_dict = {'max_iterations': 5000, 'max_epipolar_error': 1.0, 'progressive_sampling': False,
                        'min_iterations': 50, 'lo_iterations': 25, 'sample_sz': sample_sz}
     else:
-        ransac_dict = {'max_iterations': iters, 'max_epipolar_error': 2.0, 'progressive_sampling': False,
+        ransac_dict = {'max_iterations': iters, 'max_epipolar_error': 1.0, 'progressive_sampling': False,
                        'min_iterations': iters, 'sample_sz': sample_sz}
 
     ransac_dict['use_homography'] = 'H' in experiment
