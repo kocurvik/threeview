@@ -13,6 +13,8 @@ from utils.data import experiments, iterations_list, get_basenames, styles, err_
 large_size = 24
 small_size = 20
 
+colors = None
+
 def draw_results(results, experiments, iterations_list, title=''):
     plt.figure()
 
