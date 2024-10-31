@@ -71,7 +71,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
 
         colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 
-        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
+        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment])#, linestyle=styles[experiment])
 
     plt.xlim(xlim)
     plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
