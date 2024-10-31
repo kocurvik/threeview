@@ -13,8 +13,6 @@ from utils.data import experiments, iterations_list, get_basenames, styles, err_
 large_size = 24
 small_size = 20
 
-colors = None
-
 def draw_results(results, experiments, iterations_list, title=''):
     plt.figure()
 
@@ -70,8 +68,8 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
             xs.append(mean_runtime)
             ys.append(AUC10)
 
-        if colors is None:
-            colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
+
+        colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 
         plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
 
