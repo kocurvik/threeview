@@ -13,7 +13,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 
 from utils.data import err_twoview
-from utils.geometry import rotation_angle, angle, get_camera_dicts
+from utils.geometry import rotation_angle, angle, get_camera_dicts, force_inliers_twoview
 from utils.vis import draw_results_pose_auc_10
 
 
@@ -22,6 +22,7 @@ from utils.vis import draw_results_pose_auc_10
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--first', type=int, default=None)
+    parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-t', '--threshold', type=float, default=1.0)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
@@ -193,6 +194,10 @@ def get_im_generator(args, dataset_path):
             if args.shuffle > 0.0:
                 kp1 = shuffle_portion(kp1, args.shuffle)
 
+            if args.force_inliers is not None:
+                kp1, kp2 = force_inliers_twoview(kp1, kp2, R_gt, t_gt, K1, K2,
+                                                   args.force_inliers, args.threshold)
+
             yield np.copy(kp1), np.copy(kp2), R_gt, t_gt, K1, K2, args.threshold
 
     return gen_data, len(pairs)
@@ -277,6 +282,9 @@ def eval(args):
     basename = os.path.basename(dataset_path)
     # if 'kitti' in dataset_path.lower():
     #     basename = 'kitti'
+
+    if args.force_inliers is not None:
+        basename = f'{basename}-{args.force_inliers:.1f}inliers'
 
     if args.threshold != 1.0:
         basename = f'{basename}-{args.threshold}t'

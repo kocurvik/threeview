@@ -92,6 +92,23 @@ def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ra
 
     return x1, x2, x3
 
+def force_inliers_twoview(x1, x2, R, t, K1, K2, ratio, threshold):
+    F = np.linalg.inv(K2.T) @ skew(t.ravel()) @ R @ np.linalg.inv(K1)
+    inliers = get_inliers(F, x1, x2, threshold)
+    x1, x2 = x1[inliers], x2[inliers]
+
+    multiplier = (1 - ratio) / ratio
+
+    x1_new = np.random.rand(int(multiplier * len(x1)), 2)
+    x1_new[:, 0] *= K1[0, 2] / 2
+    x1_new[:, 1] *= K1[1, 2] / 2
+
+    x2_new = np.random.rand(int(multiplier * len(x2)), 2)
+    x2_new[:, 0] *= K2[0, 2] / 2
+    x2_new[:, 1] *= K2[1, 2] / 2
+
+    return np.row_stack([x1, x1_new]), np.row_stack([x2, x2_new])
+
 
 def get_camera_dicts(K_file_path):
     K_file = h5py.File(K_file_path)
