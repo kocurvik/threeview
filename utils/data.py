@@ -13,6 +13,12 @@ print('******')
 print('Color palette:')
 print(sns.color_palette("hls", len(experiments)).as_hex())
 
+
+twoview_experiments = ['5pE', '5pE + ELM', '5pE + ENM',
+               '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',
+               '4pF(A)', '3pH(A)',
+               '4pH', '4pH + ENM', '4pH + ELM']
+
 styles = {exp: 'dashed' if 'O' in exp else 'solid' for exp in experiments}
 # colors[experiments[7]] = sns.color_palette("tab10")[9]
 

@@ -4,9 +4,11 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
+import seaborn as sns
 from tqdm import tqdm
 
-from utils.data import colors, experiments, iterations_list, get_basenames, styles, err_fun_main, err_fun_max
+from utils.data import experiments, iterations_list, get_basenames, styles, err_fun_main, err_fun_max, \
+    err_twoview, twoview_experiments
 
 large_size = 24
 small_size = 20
@@ -65,6 +67,9 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
 
             xs.append(mean_runtime)
             ys.append(AUC10)
+
+        if colors is None:
+            colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 
         plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
 
@@ -151,6 +156,30 @@ def generate_graphs(dataset, results_type, all=True, use_max_err=False):
         draw_results_pose_auc_10(results, experiments, iterations_list, title, err_fun=err_fun)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
+def generate_graphs_twoview(dataset, results_type, all=True, use_max_err=False):
+    basenames = get_basenames(dataset)
+
+    # results_type = 'graph-SIFT_triplet_correspondences'
+    err_fun = err_twoview
+    err_str = 'twoview'
+
+    results = []
+    for basename in basenames:
+        json_path = os.path.join('results', f'twoview-{basename}-{results_type}.json')
+        print(f'json_path: {json_path}')
+        with open(json_path, 'r') as f:
+            if all:
+                results.extend([x for x in json.load(f) if x['experiment'] in twoview_experiments])
+            else:
+                results = [x for x in json.load(f) if x['experiment'] in twoview_experiments]
+                draw_results_pose_auc_10(results, twoview_experiments, iterations_list,
+                                         f'{err_str}{dataset}_{basename}_{results_type}', err_fun=err_fun)
+
+    if all:
+        title = f'{err_str}{dataset}_{results_type}'
+        draw_results_pose_auc_10(results, twoview_experiments, iterations_list, title, err_fun=err_fun)
+    # draw_results_pose_portion(results, experiments, iterations_list, title)
+
 def generate_outliers():
     basenames = ['StMarysChurch', 'sacre_coeur']
 
@@ -213,8 +242,9 @@ def generate_refinement_graph():
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
-    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
-    generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('pt', 'graph-0.4inliers-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)

@@ -9,12 +9,8 @@ from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_bas
 
 incdec = [1, 1, -1, -1, -1, 1]
 
-experiments = ['5pE', '5pE + ELM', '5pE + ENM',
-               '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',
-               '4pF(A)', '3pH(A)',
-               '4pH', '4pH + ENM', '4pH + ELM']
 
-names = { x: x for x in experiments}
+names = {x: x for x in twoview_experiments}
 
 def print_table_text(experiments, rows):
 
@@ -81,7 +77,7 @@ def generate_table(dataset, feat, all_experiments=False, use_max_err=False):
     if all_experiments:
         l_experiments = names.keys()
     else:
-        l_experiments = experiments
+        l_experiments = twoview_experiments
 
     results_type = f'5.0t-pairs-features_{feat}_noresize_2048-LG'
 
@@ -100,8 +96,8 @@ def generate_table(dataset, feat, all_experiments=False, use_max_err=False):
     print("Printing: ", dataset)
     print(30 * '*')
 
-    rows = get_rows(results, experiments, err_fun)
-    print_table_text(experiments, rows)
+    rows = get_rows(results, twoview_experiments, err_fun)
+    print_table_text(twoview_experiments, rows)
 
 
 def print_delta_rows(name, rows, samples):
