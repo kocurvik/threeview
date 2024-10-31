@@ -22,6 +22,7 @@ from utils.vis import draw_results_pose_auc_10
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--first', type=int, default=None)
+    parser.add_argument('-t', '--threshold', type=float, default=1.0)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
@@ -61,15 +62,15 @@ def get_result_dict(info, pose_est, R_gt, t_gt):
 
 
 def eval_experiment(x):
-    iters, experiment, kp1, kp2, R_gt, t_gt, K1, K2 = x
+    iters, experiment, kp1, kp2, R_gt, t_gt, K1, K2, t = x
 
     sample_sz = int(experiment[0])
 
     if iters is None:
-        ransac_dict = {'max_iterations': 5000, 'max_epipolar_error': 1.0, 'progressive_sampling': False,
+        ransac_dict = {'max_iterations': 5000, 'max_epipolar_error': t, 'progressive_sampling': False,
                        'min_iterations': 50, 'lo_iterations': 25, 'sample_sz': sample_sz}
     else:
-        ransac_dict = {'max_iterations': iters, 'max_epipolar_error': 1.0, 'progressive_sampling': False,
+        ransac_dict = {'max_iterations': iters, 'max_epipolar_error': t, 'progressive_sampling': False,
                        'min_iterations': iters, 'sample_sz': sample_sz}
 
     ransac_dict['use_homography'] = 'H' in experiment
@@ -124,7 +125,7 @@ def print_results(experiments, results, eq_only=False):
 
 
         tab.add_row([exp_name, np.median(p_errs), np.mean(p_errs),
-                     np.mean(p_res[:5]), np.mean(p_res[:10]), np.mean(p_res),
+                     100*np.mean(p_res[:5]), 100*np.mean(p_res[:10]), 100*np.mean(p_res),
                      np.median(times), np.mean(times),
                      np.median(inliers), np.mean(inliers)])
     print(tab)
@@ -192,7 +193,7 @@ def get_im_generator(args, dataset_path):
             if args.shuffle > 0.0:
                 kp1 = shuffle_portion(kp1, args.shuffle)
 
-            yield np.copy(kp1), np.copy(kp2), R_gt, t_gt, K1, K2
+            yield np.copy(kp1), np.copy(kp2), R_gt, t_gt, K1, K2, args.threshold
 
     return gen_data, len(pairs)
 
@@ -276,6 +277,10 @@ def eval(args):
     basename = os.path.basename(dataset_path)
     # if 'kitti' in dataset_path.lower():
     #     basename = 'kitti'
+
+    if args.threshold != 1.0:
+        basename = f'{basename}-{args.threshold}t'
+
 
     matches_basename = os.path.basename(args.feature_file)
 
