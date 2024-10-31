@@ -80,7 +80,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     plt.tick_params(axis='x', which='major', labelsize=small_size)
     plt.tick_params(axis='y', which='major', labelsize=small_size)
     if title is not None:
-        # plt.legend()
+        plt.legend()
         plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
         print(f'saved pose: {title}')
 
