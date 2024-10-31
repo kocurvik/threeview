@@ -73,7 +73,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
 
         plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment])#, linestyle=styles[experiment])
 
-    plt.xlim(xlim)
+    # plt.xlim(xlim)
     plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
     plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
@@ -128,8 +128,9 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, use_max_err=False):
-    basenames = get_basenames(dataset)
+def generate_graphs(dataset, results_type, all=True, use_max_err=False, basenames = None):
+    if basenames is None:
+        basenames = get_basenames(dataset)
 
     # results_type = 'graph-SIFT_triplet_correspondences'
     if use_max_err:
@@ -243,7 +244,10 @@ if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
     generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
-    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
+    generate_graphs('cambridge', '5.0t-graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
+    generate_graphs('cambridge', '0.5inliers-graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
+    generate_graphs('cambridge', '0.5inliers-5.0t-graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=False)
     # generate_graphs('pt', 'graph-0.4inliers-triplets-features_superpoint_noresize_2048-LG', all=False)
