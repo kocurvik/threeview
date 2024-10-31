@@ -20,6 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--first', type=int, default=None)
     parser.add_argument('-i', '--force_inliers', type=float, default=None)
+    parser.add_argument('-t', '--threshold', type=float, default=1.0)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
     parser.add_argument('-l', '--load', action='store_true', default=False)
     parser.add_argument('-g', '--graph', action='store_true', default=False)
@@ -98,7 +99,7 @@ def print_results(results):
     print(tab)
 
 def print_results_summary(results, experiments):
-    tab = PrettyTable(['experiment', 'median', 'mean', 'AUC@5', 'AUC@10', 'AUC@20', 'Mean runtime', 'Med runtime'])
+    tab = PrettyTable(['experiment', 'median', 'mean', 'AUC@5', 'AUC@10', 'AUC@20', 'Mean runtime', 'Med runtime', 'Mean inliers', 'Med inliers'])
     tab.float_format = '0.2'
 
     for experiment in experiments:
@@ -108,16 +109,17 @@ def print_results_summary(results, experiments):
         errs[np.isnan(errs)] = 180
         res = np.array([np.sum(errs < t) / len(errs) for t in range(1, 21)])
         runtime = [r['info']['runtime'] for r in exp_results]
+        inlier_ratios = [r['info']['inlier_ratio'] for r in exp_results]
         tab.add_row([experiment, np.median(errs), np.mean(errs),
                      100 * np.mean(res[:5]), 100 * np.mean(res[:10]), 100 * np.mean(res),
-                     np.mean(runtime), np.median(runtime)])
+                     np.mean(runtime), np.median(runtime), np.mean(inlier_ratios), np.median(inlier_ratios)])
 
     print(tab)
 
 
 def eval_experiment(x):
     torch.set_num_threads(1)
-    experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts = x
+    experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts, t = x
 
     use_net = '(L)' in experiment or '(L+D)' in experiment
     init_net = '(L--ID)' in experiment
@@ -154,7 +156,7 @@ def eval_experiment(x):
         delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 1.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': t, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
@@ -203,6 +205,9 @@ def eval(args):
 
     if args.force_inliers is not None:
         basename = f'{basename}-{args.force_inliers:.1f}inliers'
+
+    if args.threshold != 1.0:
+        basename = f'{basename}-{args.threshold}t'
 
 
     # experiments = ['4p3v(M)', '4p3v(M+D)', '4p3v(L)', '4p3v(L+D)', '4p3v(L+ID)', '4p3v(O)', '4p(HC)', '5p3v']
@@ -295,14 +300,14 @@ def eval(args):
 
                 if args.force_inliers is not None:
                     x1, x2, x3 = force_inliers(x1, x2, x3, img1, img2, img3, R_dict_l, T_dict_l, camera_dicts_l,
-                                               args.force_inliers)
+                                               args.force_inliers, args.threshold)
                     if len(x1) < 25:
                         continue
 
                 for iterations in iterations_list:
                     for experiment in experiments:
                         # yield experiment, img1, img2, img3, x1, x2, x3, RR_dict, TT_dict, cam_dicts
-                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict_l, T_dict_l, camera_dicts_l
+                        yield experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict_l, T_dict_l, camera_dicts_l, args.threshold
 
 
         total_length = len(experiments) * len(triplets) * len(iterations_list)

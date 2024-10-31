@@ -69,14 +69,14 @@ def add_rand_pts(x, cam_dict, multiplier):
     return np.row_stack([x, x_new])
 
 
-def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ratio):
+def force_inliers(x1, x2, x3, img1, img2, img3, R_dict, T_dict, camera_dicts, ratio, t):
     F12 = get_gt_F(img1, img2, R_dict, T_dict, camera_dicts)
     F13 = get_gt_F(img1, img3, R_dict, T_dict, camera_dicts)
     F23 = get_gt_F(img2, img3, R_dict, T_dict, camera_dicts)
 
-    inliers_12 = get_inliers(F12, x1, x2, 2.0)
-    inliers_13 = get_inliers(F13, x1, x3, 2.0)
-    inliers_23 = get_inliers(F23, x2, x3, 2.0)
+    inliers_12 = get_inliers(F12, x1, x2, t)
+    inliers_13 = get_inliers(F13, x1, x3, t)
+    inliers_23 = get_inliers(F23, x2, x3, t)
 
     l = np.logical_and(np.logical_and(inliers_12, inliers_13), inliers_23)
 

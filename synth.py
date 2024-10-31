@@ -18,6 +18,12 @@ def get_projection(P, X):
     x = x[:2, :] / x[2, np.newaxis, :]
     return x.T
 
+def get_para_projection(P, X):
+    x = P @ X.T
+    x[2, :] = np.mean(x[2, :4])
+    x = x[:2, :] / x[2, np.newaxis, :]
+    return x.T
+
 def visible_in_view(x, width=640, height=480):
     visible = np.logical_and(np.abs(x[:, 0]) <= width / 2, np.abs(x[:, 1]) <= height / 2)
     return visible
@@ -114,30 +120,63 @@ def get_scene(f, R1, t1, R2, t2, num_pts, X=None, min_distance=2, depth=1, width
 
     return x1, x2, x3, X
 
+def get_para_scene(f, R1, t1, R2, t2, num_pts, X=None, min_distance=2, depth=1, width=640, height=480, sigma_p=0.0, plot=None, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+    # K = np.diag([f, f, 1])
+
+
+    P1 = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])
+    P2 = np.column_stack([R1, t1])
+    P3 = np.column_stack([R2, t2])
+
+    if X is None:
+        X = generate_points(3 * num_pts, f, min_distance, depth, width=width, height=height)
+    x1 = get_para_projection(P1, X)
+    x2 = get_para_projection(P2, X)
+    x3 = get_para_projection(P3, X)
+
+    # visible = visible_in_view(x2, width=width, height=height)
+
+    # x1, x2, X = x1[visible][:num_pts], x2[visible][:num_pts], X[visible]
+
+    # run(f1, f2, x1, x2, scale=scale, name=name)
+    # if plot is not None:
+    #     plot_scene(X, R1, t1, f1, f2, name=plot)
+    #     # plt.savefig(f'{np.round(t)}.png')
+    #     plt.show()
+
+    return x1, x2, x3, X
+
 
 def run_synth():
     f = 600
-    R12 = Rotation.from_euler('xyz', (0, 60, 0), degrees=True).as_matrix()
-    R13 = Rotation.from_euler('xyz', (0, -30, 0), degrees=True).as_matrix()
+    R12 = Rotation.from_euler('xyz', (-5, 60, 0), degrees=True).as_matrix()
+    # R12 = np.eye(3)
+    R13 = Rotation.from_euler('xyz', (5, -30, 0), degrees=True).as_matrix()
+    # R13 = np.eye(3)
     c1 = np.array([2 * f, 0, f])
     c2 = np.array([0, f, 0.5 * f])
     # R = Rotation.from_euler('xyz', (theta, 30, 0), degrees=True).as_matrix()
     # c = np.array([f1, y, 0])
     t12 = -R12 @ c1
     t13 = -R13 @ c2
+    t12 = np.array([1, 0, 0])
+    t13 = np.array([-1, 0, 0])
 
-    x1, x2, x3, X = get_scene(f, R12, t12, R13, t13, 100)
+    # x1, x2, x3, X = get_scene(f, R12, t12, R13, t13, 100, min_distance=50000, depth=1)
+    x1, x2, x3, X = get_para_scene(f, R12, t12, R13, t13, 100, min_distance=2, depth=1)
 
-    sigma = 0.5
+    sigma = 0.0
 
-    # x1 += sigma * np.random.randn(*(x1.shape))
-    # x2 += sigma * np.random.randn(*(x1.shape))
-    # x3 += sigma * np.random.randn(*(x1.shape))
+    x1 += sigma * np.random.randn(*(x1.shape))
+    x2 += sigma * np.random.randn(*(x1.shape))
+    x3 += sigma * np.random.randn(*(x1.shape))
 
-    idxs1 = np.random.permutation(np.arange(30))
-    x1[:30] = x1[idxs1]
-    idxs2 = np.random.permutation(np.arange(30, 60))
-    x2[30:60] = x2[idxs2]
+    # idxs1 = np.random.permutation(np.arange(30))
+    # x1[:30] = x1[idxs1]
+    # idxs2 = np.random.permutation(np.arange(30, 60))
+    # x2[30:60] = x2[idxs2]
 
 
     T12 = np.diag([0, 0, 0, 1.0])
@@ -184,40 +223,61 @@ def run_synth():
     #
     # return out6['iterations'], out5['iterations'], out4['iterations']
 
+
+
+    print(R12)
+    print(t12 / np.linalg.norm(t12))
+    print(R13)
+    print(t13 / np.linalg.norm(t13))
+
+    models = poselib.para_4pt_solver(x1, x2, x3, 10)
+
+    for i, pose in enumerate(models):
+        print(f"Model {i}")
+        print(rotation_angle(pose.pose12.R.T @ R12))
+        print(rotation_angle(pose.pose13.R.T @ R13))
+        print(rotation_angle(pose.pose23().R.T @ R23))
+
+        print(angle(pose.pose12.t, t12))
+        print(angle(pose.pose13.t, t13))
+        print(angle(pose.pose23().t, t23))
+
+
+
     ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                   'min_iterations': 100, 'max_iterations': 10000, 'lo_iterations': 25,
-                   'inner_refine': False, 'threeview_check': True, 'sample_sz': 4,
-                   'delta': 0.05, 'use_hc': False}
+                   'min_iterations': 100, 'max_iterations': 100, 'lo_iterations': 0,
+                   'inner_refine': False, 'threeview_check': False, 'sample_sz': 4,
+                   'delta': 0.0, 'use_hc': False, 'use_para': True}
 
     # pose, out5 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
     # print("Rot errs 5p")
     # print(rotation_angle(pose.pose12.R.T @ R12))
     # print(rotation_angle(pose.pose13.R.T @ R13))
     #
-    # ransac_dict['sample_sz'] = 4
-    #
-    # pose, out4 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
-    # print("Rot errs 4p")
-    # print(rotation_angle(pose.pose12.R.T @ R12))
-    # print(rotation_angle(pose.pose13.R.T @ R13))
+    ransac_dict['sample_sz'] = 4
+    ransac_dict['use_affine'] = False
+    pose, out4 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'max_iterations': 0, 'verbose': False})
+    print("Rot errs 4p")
+    print(rotation_angle(pose.pose12.R.T @ R12))
+    print(rotation_angle(pose.pose13.R.T @ R13))
 
     # ransac_dict['use_net'] = False
     # ransac_dict['use_init'] = True
-    ransac_dict['sample_sz'] = 4
-    ransac_dict['gt_E'] = skew(t12) @ R12
-    print(ransac_dict['gt_E'])
-    pp = np.array([0, 0])
-    out, outR = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, pp, ransac_dict, {'verbose': False})
-    pose = out.poses
+    # ransac_dict['sample_sz'] = 4
+    # ransac_dict['gt_E'] = skew(t12) @ R12
+    # print(ransac_dict['gt_E'])
+    # pp = np.array([0, 0])
+    # out, outR = poselib.estimate_three_view_shared_focal_relative_pose(x1, x2, x3, pp, ransac_dict, {'max_iterations': 100, 'verbose': False})
+    # pose = out.poses
     # if (angle(pose.pose23().t, t23) > 1):
-    # print("Rot errs L")
-    # print(rotation_angle(pose.pose12.R.T @ R12))
-    # print(rotation_angle(pose.pose13.R.T @ R13))
-    # print(rotation_angle(pose.pose23().R.T @ R23))
-    #
-    # print(angle(pose.pose12.t, t12))
-    # print(angle(pose.pose13.t, t13))
-    # print(angle(pose.pose23().t, t23))
+    print("Rot errs L")
+    print(rotation_angle(pose.pose12.R.T @ R12))
+    print(rotation_angle(pose.pose13.R.T @ R13))
+    print(rotation_angle(pose.pose23().R.T @ R23))
+
+    print(angle(pose.pose12.t, t12))
+    print(angle(pose.pose13.t, t13))
+    print(angle(pose.pose23().t, t23))
     # print(outR['num_inliers'])
 
     # return out5['iterations'], out4['iterations'], outR['iterations']
@@ -225,7 +285,7 @@ def run_synth():
 
 
 if __name__ == '__main__':
-    iters = [run_synth() for _ in range(100)]
+    iters = [run_synth() for _ in range(1)]
     iters6 = [x[0] for x in iters]
     iters5 = [x[1] for x in iters]
     iters4 = [x[2] for x in iters]
