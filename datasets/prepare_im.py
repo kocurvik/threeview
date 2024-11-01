@@ -4,17 +4,15 @@ import os
 import random
 from pathlib import Path
 
-import cv2
 import h5py
-import joblib
 import numpy as np
 import torch
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 import lightglue
-from lightglue.utils import load_image, rbd
+from lightglue.utils import load_image
 
-from utils.matching import LoFTRMatcher
+from utils.matching import LoFTRMatcher, get_matcher_string, get_extractor, read_loftr_image
 from utils.read_write_colmap import cam_to_K, read_model
 
 
@@ -64,26 +62,6 @@ def create_gt_h5(cameras, images, out_dir, args):
         fT.create_dataset(name, shape=(3, 1), data=t.reshape(3,1))
         fK.create_dataset(name, shape=(3, 3), data=K)
 
-
-def get_matcher_string(args):
-    if args.resize is None:
-        resize_str = 'noresize'
-    else:
-        resize_str = str(args.resize)
-
-    return f'features_{args.features}_{resize_str}_{args.max_features}'
-
-def get_extractor(args):
-    if args.features == 'superpoint':
-        extractor = lightglue.SuperPoint(max_num_keypoints=args.max_features).eval().cuda()
-    elif args.features == 'disk':
-        extractor = lightglue.DISK(max_num_keypoints=args.max_features).eval().cuda()
-    elif args.features == 'sift':
-        extractor = lightglue.SIFT(max_num_keypoints=args.max_features).eval().cuda()
-    else:
-        raise NotImplementedError
-
-    return extractor
 
 def extract_features(img_dir_path, images, cameras, out_dir, args):
     # extractor = lightglue.SuperPoint(max_num_keypoints=2048).eval().cuda()
@@ -290,18 +268,6 @@ def create_triplets(out_dir, cameras, images, pts, args):
     with open(triples_txt_path, 'w') as f:
         f.writelines(line + '\n' for line in triplets)
 
-def read_loftr_image(img_dir_path, img, cameras):
-    img_path = os.path.join(img_dir_path, img.name)
-    image_array = cv2.imread(img_path)
-    cam = cameras[img.camera_id]
-
-    if cam.width != image_array.shape[1]:
-        if cam.width == image_array.shape[0]:
-            image_array = np.swapaxes(image_array, -2, -1)
-        else:
-            print(f"Image dimensions do not comply with camera width and height for: {img_path} - skipping!")
-            return None
-    return image_array
 
 def create_triplets_loftr(out_dir, img_path, cameras, images, pts, args):
     np.random.seed(args.seed)

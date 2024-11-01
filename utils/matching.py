@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import lightglue
 from kornia.feature import LoFTR
@@ -44,3 +46,39 @@ class LoFTRMatcher():
         conf = pred['confidence'].detach().cpu().numpy()
 
         return conf, kp_1, kp_2
+
+
+def get_matcher_string(args):
+    if args.resize is None:
+        resize_str = 'noresize'
+    else:
+        resize_str = str(args.resize)
+
+    return f'features_{args.features}_{resize_str}_{args.max_features}'
+
+
+def get_extractor(args):
+    if args.features == 'superpoint':
+        extractor = lightglue.SuperPoint(max_num_keypoints=args.max_features).eval().cuda()
+    elif args.features == 'disk':
+        extractor = lightglue.DISK(max_num_keypoints=args.max_features).eval().cuda()
+    elif args.features == 'sift':
+        extractor = lightglue.SIFT(max_num_keypoints=args.max_features).eval().cuda()
+    else:
+        raise NotImplementedError
+
+    return extractor
+
+
+def read_loftr_image(img_dir_path, img, cameras):
+    img_path = os.path.join(img_dir_path, img.name)
+    image_array = cv2.imread(img_path)
+    cam = cameras[img.camera_id]
+
+    if cam.width != image_array.shape[1]:
+        if cam.width == image_array.shape[0]:
+            image_array = np.swapaxes(image_array, -2, -1)
+        else:
+            print(f"Image dimensions do not comply with camera width and height for: {img_path} - skipping!")
+            return None
+    return image_array
