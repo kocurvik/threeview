@@ -247,7 +247,7 @@ def eval(args):
 
     if args.early:
         # experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM']
-        experiments = ['5p3v + ENM' '4p3v(M) + R + C + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
+        experiments = ['5p3v + ENM', '4p3v(M) + R + C + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
     if args.para:
         experiments = ['4p3v(P)']
