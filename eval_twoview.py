@@ -276,7 +276,7 @@ def eval(args):
     experiments = ['5pE', '5pE + ELM', '5pE + ENM',
                    '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',
                    '4pF(A)', '3pH(A)', '2pE(A)' 
-                   '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM'
+                   '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM',
                    '4pH', '4pH + ENM', '4pH + ELM']
 
     dataset_path = args.dataset_path
