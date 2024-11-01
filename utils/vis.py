@@ -70,7 +70,7 @@ def draw_results(results, experiments, iterations_list, title=''):
 
 
 def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
-    plt.figure(frameon=False)
+    plt.figure(frameon=True)
 
     colors, styles = get_colors_styles(experiments)
 
@@ -273,6 +273,8 @@ if __name__ == '__main__':
     # generate_graphs_twoview('eth3d', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=True)
+    generate_graphs('eth3d_test', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    generate_graphs('eth3d_test', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=True)
     # generate_graphs_twoview('pt', '0.5inliers-5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs_twoview('pt', '0.5inliers-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
