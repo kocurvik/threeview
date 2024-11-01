@@ -145,9 +145,9 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.04
+            delta = 0.08
         else:
-            delta = 0.04
+            delta = 0.08
     else:
         delta = 0
 
@@ -221,6 +221,7 @@ def eval(args):
                        '4p3v(L--ID)', '4p3v(L--ID) + R', '4p3v(L--ID) + R + C', '4p3v(L--ID) + C',
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
                        '4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
+
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
@@ -238,9 +239,9 @@ def eval(args):
 
     if args.delta:
         samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
-        experiments = [f'4p3v(M+D({x}))' for x in samples]
-        experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
-        experiments.extend([f'4p3v(M+D({x})) + R + C' for x in samples])
+        # experiments = [f'4p3v(M+D({x}))' for x in samples]
+        # experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
+        experiments = [f'4p3v(M+D({x})) + R + C' for x in samples]
 
     if args.affine:
         experiments = ['4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)']
