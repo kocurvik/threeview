@@ -1,10 +1,11 @@
 import seaborn as sns
 
-experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-               '4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
-               '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p(HC)', '5p3v', '5p3v + ENM', '5p3v + ELM', '4p3v(O) + R + C',
-               '4p3v(A)', '3p3v(A)', '2p3v(A)']
+experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
+               '4p3v(M) + ENM', '4p3v(M) + R + C + ENM',
+               '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
+               '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
+               '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
+               '4p3v(A) + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
 iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 # colors = {exp: sns.color_palette("tab10")[i] for i, exp in enumerate(experiments)}
@@ -15,9 +16,10 @@ print(sns.color_palette("hls", len(experiments)).as_hex())
 
 
 twoview_experiments = ['5pE', '5pE + ELM', '5pE + ENM',
-               '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',
-               '4pF(A)', '3pH(A)',
-               '4pH', '4pH + ENM', '4pH + ELM']
+                   '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',
+                   '4pF(A)', '3pH(A)', '2pE(A)' 
+                   '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM'
+                   '4pH', '4pH + ENM', '4pH + ELM']
 
 styles = {exp: 'dashed' if 'O' in exp else 'solid' for exp in experiments}
 # colors[experiments[7]] = sns.color_palette("tab10")[9]
