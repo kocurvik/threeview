@@ -13,7 +13,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 
 from utils.geometry import rotation_angle, angle, get_pose, get_gt_E, force_inliers, get_camera_dicts
-from utils.vis import draw_results, draw_results_pose_portion
+from utils.vis import draw_results, draw_results_pose_portion, draw_results_pose_auc_10
 
 
 def parse_args():
@@ -354,6 +354,7 @@ def eval(args):
     title = f'Scene: {os.path.basename(dataset_path)} \n'
     title += f'Matches: {matches_basename}\n'
 
+    draw_results_pose_auc_10(results, experiments, iterations_list, title=json_path)
     draw_results(results, experiments, iterations_list, title=title)
     draw_results_pose_portion(results, experiments, iterations_list)
 
