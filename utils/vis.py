@@ -16,7 +16,7 @@ small_size = 20
 def get_colors_styles(experiments):
     base_experiments = list(set([x.split(' ')[0] for x in experiments]))
 
-    base_colors = [sns.color_palette("hls", len(base_experiments))[i] for i, exp in enumerate(base_experiments)]
+    base_colors = {exp: sns.color_palette("hls", len(base_experiments))[i] for i, exp in enumerate(base_experiments)}
 
     colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
 
@@ -32,6 +32,8 @@ def get_colors_styles(experiments):
                 styles[exp] = 'dashed'
             if 'ENM' in suffix and 'R' in suffix and 'C' in suffix:
                 styles[exp] = 'dashdot'
+
+    return colors, styles
 
 def draw_results(results, experiments, iterations_list, title=''):
     plt.figure()
