@@ -13,6 +13,26 @@ from utils.data import experiments, iterations_list, get_basenames, styles, err_
 large_size = 24
 small_size = 20
 
+def get_colors_styles(experiments):
+    base_experiments = list(set([x.split(' ')[0] for x in experiments]))
+
+    base_colors = [sns.color_palette("hls", len(base_experiments))[i] for i, exp in enumerate(base_experiments)]
+
+    colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
+
+    styles = {}
+    for exp in experiments:
+        if len(exp.split(' ')) == 0:
+            styles[exp] = 'solid'
+        else:
+            suffix = ' '.join(exp.split(' ')[1:])
+            if 'ENM' in suffix:
+                styles[exp] = 'dotted'
+            if 'R' in suffix and 'C' in suffix:
+                styles[exp] = 'dashed'
+            if 'ENM' in suffix and 'R' in suffix and 'C' in suffix:
+                styles[exp] = 'dashdot'
+
 def draw_results(results, experiments, iterations_list, title=''):
     plt.figure()
 
@@ -50,6 +70,8 @@ def draw_results(results, experiments, iterations_list, title=''):
 def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
     plt.figure(frameon=False)
 
+    colors, styles = get_colors_styles(experiments)
+
     for experiment in tqdm(experiments):
         experiment_results = [x for x in results if x['experiment'] == experiment]
 
@@ -69,9 +91,9 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
             ys.append(AUC10)
 
 
-        colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
+        # colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 
-        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment])#, linestyle=styles[experiment])
+        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
 
     # plt.xlim(xlim)
     plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
