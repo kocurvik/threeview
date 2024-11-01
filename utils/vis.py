@@ -105,7 +105,9 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     plt.tick_params(axis='y', which='major', labelsize=small_size)
     if title is not None:
         plt.legend()
+        plt.title(title)
         plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
+        plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0)
         print(f'saved pose: {title}')
 
     else:
@@ -270,6 +272,7 @@ if __name__ == '__main__':
     # generate_graphs_twoview('pt', 'graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs_twoview('eth3d', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
+    generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=True)
     # generate_graphs_twoview('pt', '0.5inliers-5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs_twoview('pt', '0.5inliers-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
