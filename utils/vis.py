@@ -22,7 +22,7 @@ def get_colors_styles(experiments):
 
     styles = {}
     for exp in experiments:
-        if len(exp.split(' ')) == 0:
+        if len(exp.split(' ')) == 1:
             styles[exp] = 'solid'
         else:
             suffix = ' '.join(exp.split(' ')[1:])
