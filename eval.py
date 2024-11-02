@@ -254,7 +254,7 @@ def eval(args):
         experiments = ['4p3v(P)']
 
     if args.toptim:
-        experiments = ['5p3v', '4p3v(M) + R + C', '4p(HC)']
+        experiments = ['5p3v', '4p3v(M-D) + R + C',  '4p3v(M) + R + C', '4p(HC)']
 
 
     # experiments.extend([x + ' + C' for x in experiments])
