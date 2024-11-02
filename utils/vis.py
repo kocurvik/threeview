@@ -29,7 +29,7 @@ def get_colors_styles(experiments):
             if 'ENM' in suffix:
                 styles[exp] = 'dotted'
             if 'R' in suffix and 'C' in suffix:
-                styles[exp] = 'dashed'
+                styles[exp] = 'solid'
             if 'ENM' in suffix and 'R' in suffix and 'C' in suffix:
                 styles[exp] = 'dashdot'
 
