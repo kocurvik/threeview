@@ -79,12 +79,14 @@ def eval_experiment(x):
     ransac_dict['early_nonminimal'] = '+ ENM' in experiment
     ransac_dict['early_lm'] = '+ ELM' in experiment
 
+    delta = 0.08 if 'M-D' in experiment else 0.0
+
     if 'D(' in experiment:
         idx = experiment.find('D(')
         idx_end = experiment[idx+2:].find(')')
         delta = float(experiment[idx+2:idx + 2 + idx_end])
-    else:
-        delta = 0.0
+
+
 
     ransac_dict['delta'] = delta
 
@@ -279,7 +281,7 @@ def eval(args):
     #                '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM',
     #                '4pH', '4pH + ENM', '4pH + ELM']
 
-    experiments = ['5pE', '4pE(M)', '4pF(A)', '3pH(A)', '2pE(A)', '4pH']
+    experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '3pH(A)', '2pE(A)', '4pH']
 
     dataset_path = args.dataset_path
     basename = os.path.basename(dataset_path)
