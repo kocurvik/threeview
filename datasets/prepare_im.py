@@ -13,7 +13,7 @@ import lightglue
 from lightglue.utils import load_image
 
 from utils.matching import LoFTRMatcher, get_matcher_string, get_extractor, read_loftr_image
-from utils.read_write_colmap import cam_to_K, read_model
+from utils.read_write_colmap import cam_to_K, read_model, Image
 
 
 def parse_args():
@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('-a', '--area', type=float, default=None)
     parser.add_argument('-s', '--seed', type=int, default=100)
     parser.add_argument('-l', '--load', action='store_true', default=False)
+    parser.add_argument('-p', '--point_sampling', action='store_true', default=False)
     parser.add_argument('-f', '--features', type=str, default='superpoint')
     parser.add_argument('-mf', '--max_features', type=int, default=2048)
     parser.add_argument('-r', '--resize', type=int, default=None)
@@ -144,6 +145,17 @@ def get_overlap_areas(cameras, images, pts, img_ids):
     return area_1, area_2, area_3
 
 
+def generate_random_samples(images, pts, args):
+    if not args.point_sampling:
+        return random.sample(list(images.keys()), 3)
+
+    while True:
+        pt = random.choice(list(pts.values()))
+        pt_img_ids = list(pt.image_ids)
+        if len(pt_img_ids) >= 3:
+            return random.sample(pt_img_ids, 3)
+
+
 def create_triplets(out_dir, cameras, images, pts, args):
     np.random.seed(args.seed)
     random.seed(args.seed)
@@ -190,7 +202,7 @@ def create_triplets(out_dir, cameras, images, pts, args):
     with tqdm(total=total) as pbar:
         while output < total:
             if args.num_samples is not None:
-                img_ids = random.sample(list(images.keys()), 3)
+                img_ids = generate_random_samples(images, pts, args)
             else:
                 if all_counter >= len(img_ids_list):
                     break
@@ -198,7 +210,9 @@ def create_triplets(out_dir, cameras, images, pts, args):
                 all_counter += 1
                 pbar.update(1)
 
+
             label = '-'.join([images[x].name.split('.')[0] for x in img_ids])
+
 
             if label in h5_file:
                 continue
@@ -254,7 +268,7 @@ def create_triplets(out_dir, cameras, images, pts, args):
                     continue
 
                 h5_file.create_dataset(label, shape=out_array.shape, data=out_array)
-                triplets.append(label.replace('-', ' '))
+                triplets.append(' '.join([images[x].name.split('.')[0] for x in img_ids]))
 
                 if args.num_samples is not None:
                     pbar.update(1)
@@ -341,6 +355,29 @@ def create_triplets_loftr(out_dir, img_path, cameras, images, pts, args):
         f.writelines(line + '\n' for line in triplets)
 
 
+def fix_indoor6_images(images, img_path):
+    intrinsics = [x for x in os.listdir(img_path) if 'intrinsics.txt' in x]
+
+    name_dict = {}
+    for txt_file in intrinsics:
+        with open(os.path.join(img_path, txt_file), 'r') as f:
+            original_name = f.readline().strip().split(' ')[-1]
+            new_name = txt_file.split('.')[0]
+            name_dict[original_name] = f'{new_name}.color.jpg'
+
+    new_images = {}
+    for image_id, image in images.items():
+        new_images[image_id] = Image(
+            id=image_id,
+            qvec=image.qvec,
+            tvec=image.tvec,
+            camera_id=image.camera_id,
+            name=name_dict[image.name],
+            xys=image.xys,
+            point3D_ids=image.point3D_ids,
+        )
+
+    return new_images
 
 def prepare_single(args, subset):
     dataset_path = Path(args.dataset_path)
@@ -349,6 +386,9 @@ def prepare_single(args, subset):
     img_path, model_path, subset_path = get_dataset_paths(basename, dataset_path, subset)
 
     cameras, images, points = read_model(model_path)
+
+    if 'indoor6' in args.dataset_path.lower():
+        images = fix_indoor6_images(images, img_path)
 
     out_dir = os.path.join(args.out_path, subset)
     if not os.path.exists(out_dir):
@@ -387,6 +427,10 @@ def get_dataset_paths(basename, dataset_path, subset):
     elif 'cambridge' in basename.lower():
         model_path = os.path.join(subset_path, 'model_train')
         img_path = os.path.join(subset_path, subset)
+    elif 'indoor6' in basename.lower():
+        # model_path = os.path.join(dataset_path, 'indoor6-colmap', f'{subset}-tr', 'sparse', '0')
+        model_path = os.path.join(dataset_path, 'indoor6-colmap', subset, 'sparse', '0')
+        img_path = os.path.join(subset_path, 'images')
     else:
         model_path = os.path.join(subset_path, 'sfm')
         img_path = os.path.join(subset_path, 'images_full')
@@ -396,6 +440,7 @@ def get_dataset_paths(basename, dataset_path, subset):
 def run_im(args):
     dataset_path = Path(args.dataset_path)
     dir_list = [x for x in os.listdir(dataset_path) if os.path.isdir(os.path.join(dataset_path, x))]
+    dir_list = [x for x in dir_list if not 'colmap' in x.lower()]
 
     for subset in dir_list:
         prepare_single(args, subset)
