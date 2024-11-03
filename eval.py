@@ -19,6 +19,7 @@ from utils.vis import draw_results, draw_results_pose_portion, draw_results_pose
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--first', type=int, default=None)
+    parser.add_argument('--iters', type=int, default=None)
     parser.add_argument('-i', '--force_inliers', type=float, default=None)
     parser.add_argument('-t', '--threshold', type=float, default=1.0)
     parser.add_argument('-nw', '--num_workers', type=int, default=1)
@@ -202,7 +203,7 @@ def eval(args):
         iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
         # iterations_list = [20000, 50000]
     else:
-        iterations_list = [None]
+        iterations_list = [args.iters]
 
     if args.force_inliers is not None:
         basename = f'{basename}-{args.force_inliers:.1f}inliers'
