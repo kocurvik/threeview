@@ -5,16 +5,17 @@ import numpy as np
 from prettytable import PrettyTable
 
 from eval import print_results_summary
-from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main
+from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main, \
+    experiments
 
 incdec = [1, 1, -1, -1, -1, 1]
 
-experiments = ['4p(HC)', '5p3v',
-               '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-               '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p3v(L)', '4p3v(L) + R', '4p3v(L--ID) + R',
-               '4p3v(A)', '3p3v(A)', '2p3v(A)',
-               '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+# experiments = ['4p(HC)', '5p3v',
+#                '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+#                '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
+#                '4p3v(L)', '4p3v(L) + R', '4p3v(L--ID) + R',
+#                '4p3v(A)', '3p3v(A)', '2p3v(A)',
+#                '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
 
 names = {
         '4p(HC)' : '\\sfhc~\\cite{Hruby_cvpr2022}',
@@ -178,7 +179,7 @@ def generate_delta_table():
 
 def generate_threshold_table():
     aucs = np.empty([len(experiments), 10])
-    for i in range(1, 11):
+    for i in range(5, 11):
         if i == 1:
             json_path = os.path.join('results',
                                      f'st_peters_square-triplets-features_superpoint_noresize_2048-LG.json')
@@ -186,7 +187,7 @@ def generate_threshold_table():
             json_path = os.path.join('results', f'st_peters_square-{i:0.1f}t-triplets-features_superpoint_noresize_2048-LG.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
-            results = ([x for x in json.load(f) if 'D(' in x['experiment']])
+            results = json.load(f)
 
         for k, exp in enumerate(experiments):
             exp_results = [x for x in results if x['experiment'] == exp]
@@ -204,6 +205,8 @@ def generate_threshold_table():
         row.extend(aucs[k])
         tab.add_row(row)
 
+    tab.float_format = '0.2'
+
     print(tab)
 
 
@@ -212,6 +215,5 @@ if __name__ == '__main__':
     generate_threshold_table()
     # generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
     # generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=True)
-    generate_threshold_table()
     # generate_delta_table()
 

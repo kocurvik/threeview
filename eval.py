@@ -249,7 +249,7 @@ def eval(args):
 
     if args.early:
         # experiments = ['4p3v(M) + ELM', '4p3v(M) + R + C + ELM', '4p3v(M) + ENM', '4p3v(M) + R + C + ENM']
-        experiments = ['5p3v + ENM', '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
+        experiments = ['5p3v + ENM', '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
     if args.para:
         experiments = ['4p3v(P)']
@@ -356,9 +356,9 @@ def eval(args):
     title = f'Scene: {os.path.basename(dataset_path)} \n'
     title += f'Matches: {matches_basename}\n'
 
-    draw_results_pose_auc_10(results, experiments, iterations_list, title=json_path)
-    draw_results(results, experiments, iterations_list, title=title)
-    draw_results_pose_portion(results, experiments, iterations_list)
+    # draw_results_pose_auc_10(results, experiments, iterations_list, title=json_path)
+    # draw_results(results, experiments, iterations_list, title=title)
+    # draw_results_pose_portion(results, experiments, iterations_list)
 
 if __name__ == '__main__':
     args = parse_args()
