@@ -194,7 +194,7 @@ def generate_threshold_table():
             p_errs[np.isnan(p_errs)] = 180
             p_res = np.array([np.sum(p_errs < t) / len(p_errs) for t in range(1, 11)])
             p_auc_10 = np.mean(p_res)
-            aucs[k, i] = p_auc_10
+            aucs[k, i - 1] = p_auc_10
 
     cols = ['Method']
     cols.extend([i for i in range(1, 11)])
