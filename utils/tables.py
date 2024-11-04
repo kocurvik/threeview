@@ -179,7 +179,7 @@ def generate_delta_table():
 
 def generate_threshold_table():
     aucs = np.empty([len(experiments), 10])
-    for i in range(5, 11):
+    for i in range(1, 11):
         if i == 1:
             json_path = os.path.join('results',
                                      f'st_peters_square-triplets-features_superpoint_noresize_2048-LG.json')
