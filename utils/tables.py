@@ -2,6 +2,7 @@ import json
 import os
 
 import numpy as np
+from prettytable import PrettyTable
 
 from eval import print_results_summary
 from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main
@@ -175,9 +176,38 @@ def generate_delta_table():
     print_delta_rows('\\sftmdRC', rows_RC, samples)
     print('\\midrule')
 
+def generate_threshold_table():
+    aucs = np.empty(len(experiments), 10)
+    for i in range(1, 11):
+        json_path = os.path.join('results', f'st_peters_square-{i:0.1f}-triplets-features_superpoint_noresize_2048-LG.json')
+        print(f'json_path: {json_path}')
+        with open(json_path, 'r') as f:
+            results = ([x for x in json.load(f) if 'D(' in x['experiment']])
+
+        for k, exp in enumerate(experiments):
+            exp_results = [x for x in results if x['experiment'] == exp]
+            p_errs = np.array([err_fun_main(out) for out in exp_results])
+            p_errs[np.isnan(p_errs)] = 180
+            p_res = np.array([np.sum(p_errs < t) / len(p_errs) for t in range(1, 11)])
+            p_auc_10 = np.mean(p_res)
+            aucs[k, i] = p_auc_10
+
+    cols = ['Method']
+    cols.extend([i for i in range(1, 11)])
+    tab = PrettyTable(cols)
+    for k, exp in enumerate(experiments):
+        row = [exp]
+        row.extend(aucs[k])
+        tab.add_row(row)
+
+    print(tab)
+
+
 
 if __name__ == '__main__':
-    generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
-    generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=True)
+    generate_threshold_table()
+    # generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
+    # generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=True)
+    generate_threshold_table()
     # generate_delta_table()
 
