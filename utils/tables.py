@@ -183,7 +183,7 @@ def generate_threshold_table():
             json_path = os.path.join('results',
                                      f'st_peters_square-triplets-features_superpoint_noresize_2048-LG.json')
         else:
-            json_path = os.path.join('results', f'st_peters_square-{i:0.1f}-triplets-features_superpoint_noresize_2048-LG.json')
+            json_path = os.path.join('results', f'st_peters_square-{i:0.1f}t-triplets-features_superpoint_noresize_2048-LG.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
             results = ([x for x in json.load(f) if 'D(' in x['experiment']])
