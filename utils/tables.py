@@ -177,7 +177,7 @@ def generate_delta_table():
     print('\\midrule')
 
 def generate_threshold_table():
-    aucs = np.empty(len(experiments), 10)
+    aucs = np.empty([len(experiments), 10])
     for i in range(1, 11):
         json_path = os.path.join('results', f'st_peters_square-{i:0.1f}-triplets-features_superpoint_noresize_2048-LG.json')
         print(f'json_path: {json_path}')
