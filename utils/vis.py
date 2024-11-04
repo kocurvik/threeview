@@ -14,7 +14,7 @@ large_size = 24
 small_size = 20
 
 def get_colors_styles(experiments):
-    base_experiments = list(set([x.split(' ')[0] for x in experiments]))
+    base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
 
     base_colors = {exp: sns.color_palette("hls", len(base_experiments))[i] for i, exp in enumerate(base_experiments)}
 
