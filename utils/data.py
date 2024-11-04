@@ -75,6 +75,8 @@ def get_basenames(dataset):
         basenames = basenames_cambridge
     elif dataset == 'eth3d_test':
         basenames = basenames_eth_test
+    elif dataset == 'indoor6':
+        basenames = ['scene1', 'scene2a', 'scene3', 'scene4a', 'scene5', 'scene6']
     else:
         raise ValueError
     return basenames

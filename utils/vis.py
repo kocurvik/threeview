@@ -271,7 +271,10 @@ def generate_refinement_graph():
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
-    generate_graphs_twoview('pt', '10.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+
     # generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('eth3d', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=True)
     # generate_graphs('eth3d_test', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
@@ -279,7 +282,9 @@ if __name__ == '__main__':
     # generate_graphs_twoview('pt', '0.5inliers-5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs_twoview('pt', '0.5inliers-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
-    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
+    generate_graphs('indoor6', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     # generate_graphs('cambridge', 'graph-0.5inliers-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
     # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
