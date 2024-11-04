@@ -205,7 +205,7 @@ def generate_threshold_table():
         row.extend(aucs[k])
         tab.add_row(row)
 
-    tab.float_format = '0.2'
+    tab.float_format = '0.4'
 
     print(tab)
 
