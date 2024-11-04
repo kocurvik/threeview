@@ -22,18 +22,15 @@ def get_colors_styles(experiments):
 
     styles = {}
     for exp in experiments:
-        if len(exp.split(' ')) == 1:
-            styles[exp] = 'solid'
-        else:
-            suffix = ' '.join(exp.split(' ')[1:])
-            if 'ENM' in suffix:
-                styles[exp] = 'dotted'
-            if 'R' in suffix and 'C' in suffix:
-                styles[exp] = 'solid'
-            if 'ENM' in suffix and 'R' in suffix and 'C' in suffix:
-                styles[exp] = 'dotted'
-            else:
-                styles[exp] = 'solid'
+        # if len(exp.split(' ')) == 1:
+        #     styles[exp] = 'solid'
+        # else:
+        #     suffix = ' '.join(exp.split(' ')[1:])
+        #     if 'ENM' in suffix:
+        #         styles[exp] = 'dotted'
+        #     else:
+        #         styles[exp] = 'solid'
+        styles[exp] = 'dotted' if 'ENM' in exp else 'solid'
 
     return colors, styles
 
