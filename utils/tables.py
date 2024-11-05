@@ -217,8 +217,16 @@ def generate_threshold_table():
 if __name__ == '__main__':
     generate_delta_table()
     # generate_threshold_table()
-    # generate_table('pt', 'superpoint', all_experiments=True, use_max_err=False)
-    # generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=False)
-    # generate_table('aachen', 'superpoint', all_experiments=True, use_max_err=False)
+    generate_table('pt', 'superpoint', all_experiments=True, use_max_err=False)
+    generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=False)
+    generate_table('aachen', 'superpoint', all_experiments=True, use_max_err=False)
+
+    print(20 * '*')
+    print('maxerr')
+    print(20 * '*')
+
+    generate_table('pt', 'superpoint', all_experiments=True, use_max_err=True)
+    generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=True)
+    generate_table('aachen', 'superpoint', all_experiments=True, use_max_err=True)
 
 
