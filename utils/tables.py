@@ -46,9 +46,9 @@ names = {
         # '4p3v(L--ID)': '\\midrule\\sftlid',
         # '4p3v(L--ID) + R': '\\sftlidR',
         # '4p3v(L--ID) + R + C': '\\sftlidRC',
-        '4p3v(O)': '\\midrule\\sfto',
-        '4p3v(O) + R': '\\sftoR',
-        '4p3v(O) + R + C': '\\sftoRC',
+        # '4p3v(O)': '\\midrule\\sfto',
+        # '4p3v(O) + R': '\\sftoR',
+        # '4p3v(O) + R + C': '\\sftoRC',
     }
 
 def print_table_text(experiments, rows):
