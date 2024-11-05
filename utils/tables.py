@@ -123,7 +123,7 @@ def generate_table(dataset, feat, all_experiments=False, use_max_err=False):
 
     results = []
     for basename in basenames:
-        json_path = os.path.join('results', f'{basename}-{results_type}.json')
+        json_path = os.path.join('results', f'{basename}-5.0t-{results_type}.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
             results.extend([x for x in json.load(f) if x['experiment'] in l_experiments])
