@@ -118,6 +118,6 @@ def generate_table(dataset, feat):
     print_table_text(experiments, rows)
 
 if __name__ == '__main__':
-    generate_table('pt', 'superpoint')
-    # generate_table('cambridge', 'superpoint')
+    # generate_table('pt', 'superpoint')
+    generate_table('cambridge', 'superpoint')
 
