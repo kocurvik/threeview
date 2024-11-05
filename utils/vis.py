@@ -291,4 +291,4 @@ if __name__ == '__main__':
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('cambridge', 'focal_graph-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, focal=True)
