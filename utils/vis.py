@@ -172,9 +172,11 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None):
+def generate_graphs(dataset, results_type, all=True, basenames = None, focal=False):
     if basenames is None:
         basenames = get_basenames(dataset)
+
+    focal_str = 'focal_' if focal else ''
 
     all_results = []
     for basename in basenames:
@@ -183,7 +185,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None):
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in experiments]
             draw_results_pose_auc_10(results, experiments, iterations_list,
-                                     f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+                                     f'{focal_str}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -285,8 +287,8 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
 
     generate_graphs('cambridge', 'focal_graph-triplets-features_superpoint_noresize_2048-LG', all=True)
