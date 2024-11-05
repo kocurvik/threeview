@@ -18,11 +18,8 @@ small_size = 20
 def get_colors_styles(experiments):
     # base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
     base_experiments = experiments
-
-    base_colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
+    colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
     # base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
-
-    colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
 
     print(colors)
 
@@ -112,8 +109,8 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     if title is not None:
         # plt.legend()
         # plt.title(title)
-        plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
-        plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0)
+        plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0.1)
+        plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0.1)
         print(f'saved pose: {title}')
 
     else:
