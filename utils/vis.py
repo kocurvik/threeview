@@ -16,7 +16,8 @@ small_size = 20
 def get_colors_styles(experiments):
     base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
 
-    base_colors = {exp: sns.color_palette("tab10", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
+    base_colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
+    # base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
 
     colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
 
