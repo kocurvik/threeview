@@ -176,24 +176,23 @@ def generate_graphs(dataset, results_type, all=True, basenames = None):
     if basenames is None:
         basenames = get_basenames(dataset)
 
-    results = []
+    all_results = []
     for basename in basenames:
         json_path = os.path.join('results', f'{basename}-{results_type}.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
+            results = [x for x in json.load(f) if x['experiment'] in experiments]
+            draw_results_pose_auc_10(results, experiments, iterations_list,
+                                     f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+            # draw_results_pose_auc_10(results, experiments, iterations_list,
+            #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
-                results.extend([x for x in json.load(f) if x['experiment'] in experiments])
-            else:
-                results = [x for x in json.load(f) if x['experiment'] in experiments]
-                draw_results_pose_auc_10(results, experiments, iterations_list,
-                                         f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
-                draw_results_pose_auc_10(results, experiments, iterations_list,
-                                         f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
+               all_results.extend(results)
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(results, experiments, iterations_list, title, err_fun=err_fun_main)
-        draw_results_pose_auc_10(results, experiments, iterations_list, 'maxerr_' + title, err_fun=err_fun_max)
+        draw_results_pose_auc_10(all_results, experiments, iterations_list, title, err_fun=err_fun_main)
+        draw_results_pose_auc_10(all_results, experiments, iterations_list, 'maxerr_' + title, err_fun=err_fun_max)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True, use_max_err=False):
