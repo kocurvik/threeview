@@ -20,30 +20,30 @@ incdec = [1, 1, -1, -1, -1, 1]
 names = {
         '4p(HC)' : '\\sfhc~\\cite{Hruby_cvpr2022}',
         '5p3v': '\\midrule\\sft',
-        '5p3v + ENM': '\\midrule\\sftnm',
-        '5p3v + ELM': '\\midrule\\sftlm',
-        '4p3v(M)': '\\midrule\\sftm',
-        '4p3v(M) + R': '\\sftmR',
-        '4p3v(M) + R + C': '\\sftmRC',
-        '4p3v(M) + ELM': '\\midrule\\sftmlm',
-        '4p3v(M) + ENM': '\\sftmnm',
-        '4p3v(M) + R + C + ELM': '\\sftmRClm',
-        '4p3v(M) + R + C + ENM': '\\sftmRCnm',
-        '4p3v(M-D)': '\\midrule\\sftmd',
-        '4p3v(M-D) + R': '\\sftmdR',
-        '4p3v(M-D) + R + C': '\\sftmdRC',
-        '4p3v(L)': '\\midrule\\sftl',
-        '4p3v(L) + R': '\\sftlR',
-        '4p3v(L) + R + C': '\\sftlRC',
-        '4p3v(L-D)': '\\midrule\\sftld',
-        '4p3v(L-D) + R': '\\sftldR',
-        '4p3v(L-D) + R + C': '\\sftldRC',
-        '4p3v(L--ID)': '\\midrule\\sftlid',
-        '4p3v(L--ID) + R': '\\sftlidR',
-        '4p3v(L--ID) + R + C': '\\sftlidRC',
+        # '5p3v + ENM': '\\midrule\\sftnm',
+        # '5p3v + ELM': '\\midrule\\sftlm',
         '4p3v(A)' : '\\midrule \\sfaf',
         '3p3v(A)' : '\\sfah',
         '2p3v(A)' : '\\sfae',
+        '4p3v(M)': '\\midrule\\sftm',
+        '4p3v(M) + R': '\\sftmR',
+        '4p3v(M) + R + C': '\\sftmRC',
+        # '4p3v(M) + ELM': '\\midrule\\sftmlm',
+        # '4p3v(M) + ENM': '\\sftmnm',
+        # '4p3v(M) + R + C + ELM': '\\sftmRClm',
+        # '4p3v(M) + R + C + ENM': '\\sftmRCnm',
+        '4p3v(M-D)': '\\midrule\\sftmd',
+        '4p3v(M-D) + R': '\\sftmdR',
+        '4p3v(M-D) + R + C': '\\sftmdRC',
+        # '4p3v(L)': '\\midrule\\sftl',
+        # '4p3v(L) + R': '\\sftlR',
+        # '4p3v(L) + R + C': '\\sftlRC',
+        # '4p3v(L-D)': '\\midrule\\sftld',
+        # '4p3v(L-D) + R': '\\sftldR',
+        # '4p3v(L-D) + R + C': '\\sftldRC',
+        # '4p3v(L--ID)': '\\midrule\\sftlid',
+        # '4p3v(L--ID) + R': '\\sftlidR',
+        # '4p3v(L--ID) + R + C': '\\sftlidRC',
         '4p3v(O)': '\\midrule\\sfto',
         '4p3v(O) + R': '\\sftoR',
         '4p3v(O) + R + C': '\\sftoRC',
@@ -213,7 +213,8 @@ def generate_threshold_table():
 
 if __name__ == '__main__':
     generate_threshold_table()
-    # generate_table('pt', 'superpoint', all_experiments=False, use_max_err=True)
-    # generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=True)
+    generate_table('pt', 'superpoint', all_experiments=False, use_max_err=False)
+    generate_table('cambridge', 'superpoint', all_experiments=False, use_max_err=False)
+    generate_table('aachen', 'superpoint', all_experiments=False, use_max_err=False)
     # generate_delta_table()
 
