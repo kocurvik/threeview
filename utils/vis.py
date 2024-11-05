@@ -172,17 +172,9 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, use_max_err=False, basenames = None):
+def generate_graphs(dataset, results_type, all=True, basenames = None):
     if basenames is None:
         basenames = get_basenames(dataset)
-
-    # results_type = 'graph-SIFT_triplet_correspondences'
-    if use_max_err:
-        err_fun = err_fun_max
-        err_str = 'maxerr_'
-    else:
-        err_fun = err_fun_main
-        err_str = ''
 
     results = []
     for basename in basenames:
@@ -294,6 +286,8 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+
+    generate_graphs('cambridge', 'focal_graph-triplets-features_superpoint_noresize_2048-LG', all=True)

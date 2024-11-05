@@ -162,7 +162,7 @@ def eval_experiment(x):
     oracle = '(O)' in experiment
 
     # using R
-    inner_refine = 100 if '+ R' in experiment else 0
+    inner_refine = 2 if '+ R' in experiment else 0
     if '+ R(' in experiment:
         idx = experiment.find('R(')
         idx_end = experiment[idx+2:].find(')')
@@ -175,9 +175,9 @@ def eval_experiment(x):
     # using delta
     if 'D' in experiment:
         if use_net or init_net:
-            delta = 0.04
+            delta = 0.08
         else:
-            delta = 0.04
+            delta = 0.08
     else:
         delta = 0
 
@@ -187,7 +187,7 @@ def eval_experiment(x):
         delta = float(experiment[idx+2:idx + 2 + idx_end])
 
     num_pts = int(experiment[0])
-    ransac_dict = {'max_epipolar_error': 3.0, 'progressive_sampling': False,
+    ransac_dict = {'max_epipolar_error': 5.0, 'progressive_sampling': False,
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle}
@@ -237,7 +237,7 @@ def eval(args):
     basename = os.path.basename(dataset_path)
     if args.graph:
         basename = f'{basename}-graph'
-        iterations_list = [100] #, 200, 500, 1000, 2000, 5000, 10000]
+        iterations_list = [100, 200, 500, 1000, 2000, 5000, 10000]
         # iterations_list = [20000, 50000]
     else:
         iterations_list = [None]
@@ -258,7 +258,7 @@ def eval(args):
     else:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
                        '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
-                       '6p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C']
+                       '6p3v']
 
     if args.refine:
         experiments = [f'4p3v(M) + R({x}) + C' for x in [20, 30, 40, 50, 100, 200]]
