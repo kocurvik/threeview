@@ -16,7 +16,7 @@ small_size = 20
 def get_colors_styles(experiments):
     base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
 
-    base_colors = {exp: sns.color_palette("hls", len(base_experiments))[i] for i, exp in enumerate(base_experiments)}
+    base_colors = {exp: sns.color_palette("tab:10", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
 
     colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
 
@@ -30,7 +30,8 @@ def get_colors_styles(experiments):
         #         styles[exp] = 'dotted'
         #     else:
         #         styles[exp] = 'solid'
-        styles[exp] = 'dotted' if 'ENM' in exp else 'solid'
+        # styles[exp] = 'dotted' if 'ENM' in exp else 'solid'
+        styles[exp] = 'solid'
 
     return colors, styles
 
@@ -69,7 +70,7 @@ def draw_results(results, experiments, iterations_list, title=''):
 
 
 def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
-    plt.figure(frameon=True)
+    plt.figure(frameon=False)
 
     colors, styles = get_colors_styles(experiments)
 
@@ -103,8 +104,8 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     plt.tick_params(axis='x', which='major', labelsize=small_size)
     plt.tick_params(axis='y', which='major', labelsize=small_size)
     if title is not None:
-        plt.legend()
-        plt.title(title)
+        # plt.legend()
+        # plt.title(title)
         plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
         plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0)
         print(f'saved pose: {title}')
@@ -280,10 +281,10 @@ if __name__ == '__main__':
     # generate_graphs_twoview('pt', '0.5inliers-graph-pairs-features_superpoint_noresize_2048-LG', all=True, use_max_err=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=True, basenames = ['ShopFacade'])
 
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False,
-                    use_max_err=False)
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=False)
     generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=False, use_max_err=False)
-    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
+
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     # generate_graphs('indoor6', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)

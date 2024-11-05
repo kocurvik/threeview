@@ -7,15 +7,13 @@ import seaborn as sns
 #                '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
 #                '4p3v(A) + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
-experiments = ['4p3v(M) + R + C', '4p3v(M) + R + C + ENM',
-               '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM',
-               '4p(HC)', '5p3v', '5p3v + ENM', #'4p3v(O) + R + C', '4p3v(O) + R + C + ENM',
-               # '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
-               '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
+experiments = ['4p3v(M) + R + C',
+               '4p3v(M-D) + R + C',
+               '4p(HC)', '5p3v',
+               '3p3v(A)']
 
 iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 # colors = {exp: sns.color_palette("tab10")[i] for i, exp in enumerate(experiments)}
-colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 print('******')
 print('Color palette:')
 print(sns.color_palette("hls", len(experiments)).as_hex())
