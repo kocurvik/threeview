@@ -238,13 +238,14 @@ def eval(args):
             experiments = []
 
     if args.refine:
-        experiments = [f'4p3v(M) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
+        experiments = [f'4p3v(M-D) + R({x}) + C' for x in [1, 2, 3, 5, 10]]
 
     if args.delta:
-        samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
-        # experiments = [f'4p3v(M+D({x}))' for x in samples]
-        # experiments.extend([f'4p3v(M+D({x})) + R' for x in samples])
-        experiments = [f'4p3v(M+D({x})) + R + C' for x in samples]
+        # samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
+        samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.01, 0.005, 0.001]
+        experiments = [f'4p3v(M-D({x}))' for x in samples]
+        experiments.extend([f'4p3v(M-D({x})) + R' for x in samples])
+        experiments.extend([f'4p3v(M-D({x})) + R + C' for x in samples])
 
     if args.affine:
         experiments = ['4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)']

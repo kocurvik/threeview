@@ -152,12 +152,13 @@ def print_delta_rows(name, rows, samples):
 
 
 def generate_delta_table():
-    json_path = os.path.join('results', 'st_peters_square-triplets-features_superpoint_noresize_2048-LG.json')
+    json_path = os.path.join('results', 'st_peters_square-5.0t-triplets-features_superpoint_noresize_2048-LG.json')
     print(f'json_path: {json_path}')
     with open(json_path, 'r') as f:
         results = ([x for x in json.load(f) if 'D(' in x['experiment']])
 
     samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
+    samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.01, 0.005, 0.001]
     experiments_M = [f'4p3v(M+D({x}))' for x in samples]
     experiments_R = [f'4p3v(M+D({x})) + R' for x in samples]
     experiments_RC = [f'4p3v(M+D({x})) + R + C' for x in samples]
@@ -214,9 +215,10 @@ def generate_threshold_table():
 
 
 if __name__ == '__main__':
+    generate_delta_table()
     # generate_threshold_table()
-    generate_table('pt', 'superpoint', all_experiments=True, use_max_err=False)
-    generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=False)
-    generate_table('aachen', 'superpoint', all_experiments=True, use_max_err=False)
-    # generate_delta_table()
+    # generate_table('pt', 'superpoint', all_experiments=True, use_max_err=False)
+    # generate_table('cambridge', 'superpoint', all_experiments=True, use_max_err=False)
+    # generate_table('aachen', 'superpoint', all_experiments=True, use_max_err=False)
+
 
