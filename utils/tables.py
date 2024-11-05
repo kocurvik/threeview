@@ -159,9 +159,9 @@ def generate_delta_table():
 
     samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005, 0.001]
     samples = [0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.01, 0.005, 0.001]
-    experiments_M = [f'4p3v(M+D({x}))' for x in samples]
-    experiments_R = [f'4p3v(M+D({x})) + R' for x in samples]
-    experiments_RC = [f'4p3v(M+D({x})) + R + C' for x in samples]
+    experiments_M = [f'4p3v(M-D({x}))' for x in samples]
+    experiments_R = [f'4p3v(M-D({x})) + R' for x in samples]
+    experiments_RC = [f'4p3v(M-D({x})) + R + C' for x in samples]
 
     rows_M = get_rows(results, experiments_M, err_fun=err_fun_main, runtime=False)
     rows_R = get_rows(results, experiments_R, err_fun=err_fun_main, runtime=False)
