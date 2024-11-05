@@ -139,8 +139,8 @@ def generate_table(dataset, feat, all_experiments=False, use_max_err=False):
 
     # print_results_summary(results, experiments)
 
-    rows = get_rows(results, experiments, err_fun)
-    print_table_text(experiments, rows)
+    rows = get_rows(results, l_experiments, err_fun)
+    print_table_text(l_experiments, rows)
 
 
 def print_delta_rows(name, rows, samples):
