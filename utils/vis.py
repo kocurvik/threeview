@@ -7,8 +7,10 @@ from matplotlib.ticker import StrMethodFormatter
 import seaborn as sns
 from tqdm import tqdm
 
-from utils.data import experiments, iterations_list, get_basenames, styles, err_fun_main, err_fun_max, \
+from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview, twoview_experiments
+
+experiments = ['4p(HC)', '5p3v', '3p3v(A)', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
@@ -109,7 +111,9 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     if title is not None:
         # plt.legend()
         # plt.title(title)
-        plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
+        # plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
+        plt.rcParams.update({'figure.autolayout': True})
+        plt.savefig(f'figs/{title}_pose.pdf', pad_inches=0)
         plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0)
         print(f'saved pose: {title}')
 
@@ -276,6 +280,6 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
     generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, use_max_err=False)
