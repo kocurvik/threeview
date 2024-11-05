@@ -10,13 +10,14 @@ from tqdm import tqdm
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview, twoview_experiments
 
-experiments = ['4p(HC)', '5p3v', '3p3v(A)', '4p3v(M-D) + R + C']
+experiments = ['4p(HC)', '5p3v', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
 
 def get_colors_styles(experiments):
-    base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
+    # base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
+    base_experiments = experiments
 
     base_colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
     # base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
