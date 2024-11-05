@@ -20,6 +20,8 @@ def get_colors_styles(experiments):
 
     colors = {x: base_colors[x.split(' ')[0]] for x in experiments}
 
+    print(colors)
+
     styles = {}
     for exp in experiments:
         # if len(exp.split(' ')) == 1:
