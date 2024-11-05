@@ -11,10 +11,6 @@ experiments = ['4p(HC)', '5p3v', '3p3v(A)' '4p3v(M-D) + R + C']
 
 iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 # colors = {exp: sns.color_palette("tab10")[i] for i, exp in enumerate(experiments)}
-print('******')
-print('Color palette:')
-print(sns.color_palette("hls", len(experiments)).as_hex())
-
 
 # twoview_experiments = ['5pE', '5pE + ELM', '5pE + ENM',
 #                    '4pE(M)', '4pE(M) + ELM', '4pE(M) + ENM',

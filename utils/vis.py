@@ -10,7 +10,7 @@ from tqdm import tqdm
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview, twoview_experiments
 
-experiments = ['4p(HC)', '5p3v', '4p3v(M-D) + R + C']
+experiments = ['4p(HC)', '5p3v', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
@@ -76,7 +76,7 @@ def draw_results(results, experiments, iterations_list, title=''):
 
 
 def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
-    plt.figure(frameon=False)
+    plt.figure(frameon=True)
 
     colors, styles = get_colors_styles(experiments)
 
@@ -112,9 +112,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     if title is not None:
         # plt.legend()
         # plt.title(title)
-        # plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
-        plt.rcParams.update({'figure.autolayout': True})
-        plt.savefig(f'figs/{title}_pose.pdf', pad_inches=0)
+        plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
         plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0)
         print(f'saved pose: {title}')
 
