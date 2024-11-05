@@ -4,6 +4,7 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
+from matplotlib import rc
 import seaborn as sns
 from tqdm import tqdm
 
@@ -14,6 +15,18 @@ experiments = ['4p(HC)', '5p3v', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
+
+plt.rcParams.update({'figure.autolayout': True})
+
+# plt.rcParams.update({'figure.autolayout': True})
+# rc('font',**{'family':'serif','serif':['Times New Roman']})
+# rc('font',**{'family':'serif'})
+# rc('text', usetex=True)
+
+# plt.rcParams['mathtext.fontset'] = 'custom'
+# plt.rcParams['mathtext.rm'] = 'Times New Roman'
+# plt.rcParams['mathtext.it'] = 'Times New Roman:italic'
+# plt.rcParams['mathtext.bf'] = 'Times New Roman:bold'
 
 def get_colors_styles(experiments):
     # base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
@@ -73,7 +86,7 @@ def draw_results(results, experiments, iterations_list, title=''):
 
 
 def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
-    plt.figure(frameon=True)
+    fig = plt.figure(frameon=True)
 
     colors, styles = get_colors_styles(experiments)
 
@@ -101,7 +114,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
         plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
 
     # plt.xlim(xlim)
-    plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
+    # plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
     plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
     plt.tick_params(axis='x', which='major', labelsize=small_size)
@@ -109,7 +122,9 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
     if title is not None:
         # plt.legend()
         # plt.title(title)
-        plt.savefig(f'figs/{title}_pose.pdf')#, bbox_inches='tight', pad_inches=0.1)
+        # plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
+        plt.savefig(f'figs/{title}_pose.pdf')#, bbox_inches='tight', pad_inches=0)
+
         plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0.1)
         print(f'saved pose: {title}')
 
@@ -261,7 +276,7 @@ def generate_refinement_graph():
 
 
     plt.xlim([8.0, 1.9e3])
-    plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
+    # plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
     plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
     plt.tick_params(axis='x', which='major', labelsize=small_size)
