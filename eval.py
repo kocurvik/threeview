@@ -34,6 +34,7 @@ def parse_args():
     parser.add_argument('--affine', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
     parser.add_argument('--final', action='store_true', default=False)
+    parser.add_argument('--rc', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
     parser.add_argument('feature_file')
@@ -265,6 +266,9 @@ def eval(args):
                        '4p3v(O) + R + C', '4p3v(O) + R + C + ENM',
                        '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
                        '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
+
+    if args.rc:
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(A)', '4p3v(A) + R']
 
 
     # experiments.extend([x + ' + C' for x in experiments])

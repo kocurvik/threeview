@@ -23,6 +23,8 @@ names = {
         # '5p3v + ENM': '\\midrule\\sftnm',
         # '5p3v + ELM': '\\midrule\\sftlm',
         '4p3v(A)' : '\\midrule \\sfaf',
+        '4p3v(A) + R' : '\\midrule \\sfafR',
+        '4p3v(A) + R + C' : '\\midrule \\sfafRC',
         '3p3v(A)' : '\\sfah',
         '2p3v(A)' : '\\sfae',
         '4p3v(M)': '\\midrule\\sftm',
