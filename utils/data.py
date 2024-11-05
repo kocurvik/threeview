@@ -7,8 +7,7 @@ import seaborn as sns
 #                '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
 #                '4p3v(A) + ENM', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
-experiments = ['4p3v(M) + R + C',
-               '4p3v(M-D) + R + C',
+experiments = ['4p3v(M-D) + R + C',
                '4p(HC)', '5p3v',
                '3p3v(A)']
 
