@@ -172,11 +172,9 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None, focal=False):
+def generate_graphs(dataset, results_type, all=True, basenames = None):
     if basenames is None:
         basenames = get_basenames(dataset)
-
-    focal_str = 'focal_' if focal else ''
 
     all_results = []
     for basename in basenames:
@@ -185,7 +183,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, focal=Fal
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in experiments]
             draw_results_pose_auc_10(results, experiments, iterations_list,
-                                     f'{focal_str}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+                                     f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -237,7 +235,7 @@ def generate_outliers():
                 draw_results_pose_auc_10(results, experiments, iterations_list, f'{basename}_{results_type}', xlim=(2.0, 7.9e3))
 
 def generate_refinement_graph():
-    json_path = os.path.join('results', 'st_peters_square-graph-triplets-features_superpoint_noresize_2048-LG.json')
+    json_path = os.path.join('results', 'st_peters_square-graph-5.0t-triplets-features_superpoint_noresize_2048-LG.json')
     print(f'json_path: {json_path}')
     with open(json_path, 'r') as f:
         results = ([x for x in json.load(f) if 'R(' in x['experiment']])
@@ -282,7 +280,7 @@ def generate_refinement_graph():
 
 if __name__ == '__main__':
     # generate_outliers()
-    # generate_refinement_graph()
+    generate_refinement_graph()
     # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
@@ -290,5 +288,5 @@ if __name__ == '__main__':
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-
-    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True, focal=True)
+    #
+    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
