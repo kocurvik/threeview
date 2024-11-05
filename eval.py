@@ -266,10 +266,11 @@ def eval(args):
                        '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
                        '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
+
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
-    json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
+    json_path = os.path.join('results', f'{basename}-5.0t-{matches_basename}.json')
     print(f'json_path: {json_path}')
 
     if args.load:
