@@ -245,7 +245,7 @@ def generate_refinement_graph():
     samples = [1, 2, 3, 5, 10]
 
     for steps in tqdm(samples):
-        experiment = f'4p3v(M) + R({steps}) + C'
+        experiment = f'4p3v(M-D) + R({steps}) + C'
         experiment_results = [x for x in results if x['experiment'] == experiment]
 
         xs = []
@@ -265,11 +265,10 @@ def generate_refinement_graph():
 
         plt.semilogx(xs, ys, label=steps, marker='*')
 
-    small_size = 10
-    large_size = 12
+    small_size = 12
+    large_size = 14
 
-
-    plt.xlim([8.0, 1.9e3])
+    # plt.xlim([8.0, 1.9e3])
     # plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
     plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)

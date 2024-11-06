@@ -10,9 +10,9 @@ incdec = [1, 1, -1, -1, -1, 1]
 
 experiments = ['6p3v',
                '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
-               '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
-               '4p3v(L)', '4p3v(L) + R', '4p3v(L-ID) + R',
-               '4p3v(O)', '4p3v(O) + R']
+               '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',]
+               # '4p3v(L)', '4p3v(L) + R', '4p3v(L-ID) + R',
+               # '4p3v(O)', '4p3v(O) + R']
 
 names = {
         '4p(HC)' : '\\sshc',
@@ -23,18 +23,18 @@ names = {
         '4p3v(M-D)': '\\sstmd',
         '4p3v(M-D) + R': '\\sstmdR',
         '4p3v(M-D) + R + C': '\\sstmdRC',
-        '4p3v(L)': '\\sstl',
-        '4p3v(L) + R': '\\sstlR',
-        '4p3v(L) + R + C': '\\sstlRC',
-        '4p3v(L-D)': '\\sstld',
-        '4p3v(L-D) + R': '\\sstldR',
-        '4p3v(L-D) + R + C': '\\sstldRC',
-        '4p3v(L-ID)': '\\sstlid',
-        '4p3v(L-ID) + R': '\\sstlidR',
-        '4p3v(L-ID) + R + C': '\\sstlidRC',
-        '4p3v(O)': '\\midrule\\ssto',
-        '4p3v(O) + R': '\\sstoR',
-        '4p3v(O) + R + C': '\\sstoRC',
+        # '4p3v(L)': '\\sstl',
+        # '4p3v(L) + R': '\\sstlR',
+        # '4p3v(L) + R + C': '\\sstlRC',
+        # '4p3v(L-D)': '\\sstld',
+        # '4p3v(L-D) + R': '\\sstldR',
+        # '4p3v(L-D) + R + C': '\\sstldRC',
+        # '4p3v(L-ID)': '\\sstlid',
+        # '4p3v(L-ID) + R': '\\sstlidR',
+        # '4p3v(L-ID) + R + C': '\\sstlidRC',
+        # '4p3v(O)': '\\midrule\\ssto',
+        # '4p3v(O) + R': '\\sstoR',
+        # '4p3v(O) + R + C': '\\sstoRC',
     }
 
 def print_table_text(experiments, rows):
@@ -58,8 +58,8 @@ def get_rows(results, order):
     for experiment in order:
         exp_results = [x for x in results if x['experiment'] == experiment]
 
-        # p_errs = np.array([max(0.5 *(out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err'])) for out in exp_results])
-        p_errs = np.array([out['f_err'] for out in exp_results])
+        p_errs = np.array([max(0.5 *(out['R_12_err'] + out['R_13_err']), 0.5 * (out['t_12_err'] + out['t_13_err'])) for out in exp_results])
+        # p_errs = np.array([out['f_err'] for out in exp_results])
         p_errs[np.isnan(p_errs)] = 180
         p_res = np.array([np.sum(p_errs < t) / len(p_errs) for t in range(1, 21)])
         p_auc_5 = np.mean(p_res[:5])

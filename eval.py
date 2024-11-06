@@ -32,6 +32,7 @@ def parse_args():
     parser.add_argument('-o', '--overwrite', action='store_true', default=False)
     parser.add_argument('-e', '--early', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
+    parser.add_argument('--learning', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
     parser.add_argument('--final', action='store_true', default=False)
     parser.add_argument('--rc', action='store_true', default=False)
@@ -125,8 +126,8 @@ def eval_experiment(x):
     torch.set_num_threads(1)
     experiment, iterations, img1, img2, img3, x1, x2, x3, R_dict, T_dict, camera_dicts, t = x
 
-    use_net = '(L)' in experiment or '(L+D)' in experiment
-    init_net = '(L--ID)' in experiment
+    use_net = '(L)' in experiment or '(L-D)' in experiment
+    init_net = '(L-ID)' in experiment
     use_hc = 'HC' in experiment
     threeview_check = '+ C' in experiment
     oracle = '(O)' in experiment
@@ -231,6 +232,11 @@ def eval(args):
                        '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
                        '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)']
 
+    if args.learning:
+        experiments = ['4p3v(L) + R + C', '4p3v(L-D) + R + C', '4p3v(L-ID) + R + C',
+                       '4p3v(L) + R', '4p3v(L-D) + R', '4p3v(L-ID) + R',
+                       '4p3v(L)', '4p3v(L-D)', '4p3v(L-ID)']
+
     if args.fix_delta:
         if args.all:
             experiments = ['4p3v(L--ID)', '4p3v(L--ID) + R', '4p3v(L--ID) + R + C', '4p3v(L--ID) + C']
@@ -259,14 +265,6 @@ def eval(args):
 
     if args.toptim:
         experiments = ['5p3v', '4p3v(M-D) + R + C',  '4p3v(M) + R + C', '4p(HC)']
-
-    if args.final:
-        experiments = ['4p3v(M) + R + C', '4p3v(M) + R + C + ENM',
-                       '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM',
-                       '4p(HC)', '5p3v', '5p3v + ENM',
-                       '4p3v(O) + R + C', '4p3v(O) + R + C + ENM',
-                       '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)',
-                       '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '2p3v(A) + ENM']
 
     if args.rc:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(A)', '4p3v(A) + R']
