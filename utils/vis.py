@@ -172,7 +172,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments):
+def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix=''):
     if basenames is None:
         basenames = get_basenames(dataset)
 
@@ -183,7 +183,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in exps]
             draw_results_pose_auc_10(results, exps, iterations_list,
-                                     f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -191,8 +191,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, exps, iterations_list, title, err_fun=err_fun_main)
-        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + title, err_fun=err_fun_max)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
@@ -286,8 +286,8 @@ if __name__ == '__main__':
 
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     #
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
