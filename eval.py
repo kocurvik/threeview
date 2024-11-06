@@ -32,6 +32,7 @@ def parse_args():
     parser.add_argument('-o', '--overwrite', action='store_true', default=False)
     parser.add_argument('-e', '--early', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
+    parser.add_argument('--oracles', action='store_true', default=False)
     parser.add_argument('--learning', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
     parser.add_argument('--final', action='store_true', default=False)
@@ -236,6 +237,9 @@ def eval(args):
         experiments = ['4p3v(L) + R + C', '4p3v(L-D) + R + C', '4p3v(L-ID) + R + C',
                        '4p3v(L) + R', '4p3v(L-D) + R', '4p3v(L-ID) + R',
                        '4p3v(L)', '4p3v(L-D)', '4p3v(L-ID)']
+
+    if args.oracles:
+        experiments = ['4p3v(O)', '4p3v(O) + R']
 
     if args.fix_delta:
         if args.all:
