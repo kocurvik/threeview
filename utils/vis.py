@@ -9,7 +9,7 @@ import seaborn as sns
 from tqdm import tqdm
 
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
-    err_twoview, twoview_experiments
+    err_twoview
 
 experiments = ['4p(HC)', '5p3v', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
 
@@ -172,7 +172,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None):
+def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments):
     if basenames is None:
         basenames = get_basenames(dataset)
 
@@ -181,8 +181,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None):
         json_path = os.path.join('results', f'{basename}-{results_type}.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
-            results = [x for x in json.load(f) if x['experiment'] in experiments]
-            draw_results_pose_auc_10(results, experiments, iterations_list,
+            results = [x for x in json.load(f) if x['experiment'] in exps]
+            draw_results_pose_auc_10(results, exps, iterations_list,
                                      f'{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
@@ -191,11 +191,13 @@ def generate_graphs(dataset, results_type, all=True, basenames = None):
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, experiments, iterations_list, title, err_fun=err_fun_main)
-        draw_results_pose_auc_10(all_results, experiments, iterations_list, 'maxerr_' + title, err_fun=err_fun_max)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, title, err_fun=err_fun_main)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + title, err_fun=err_fun_max)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
+    twoview_experiments = ['5pE', '4pE(M)', '4pE(M-D)', '3pH(A)']
+
     basenames = get_basenames(dataset)
 
     # results_type = 'graph-SIFT_triplet_correspondences'
@@ -206,17 +208,15 @@ def generate_graphs_twoview(dataset, results_type, all=True):
         json_path = os.path.join('results', f'twoview-{basename}-{results_type}.json')
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
-            results = [x for x in json.load(f) if x['experiment'] in experiments]
-            draw_results_pose_auc_10(results, experiments, iterations_list,
-                                     f'twoview_{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
-            # draw_results_pose_auc_10(results, experiments, iterations_list,
-            #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
+            results = [x for x in json.load(f) if x['experiment'] in twoview_experiments]
+            # draw_results_pose_auc_10(results, twoview_experiments, [10, 20, 50, 100, 200, 500, 1000],
+            #                          f'twoview_{dataset}_{basename}_{results_type}', err_fun=err_fun)
             if all:
                all_results.extend(results)
 
     if all:
         title = f'twoview_{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, twoview_experiments, iterations_list, title, err_fun=err_fun)
+        draw_results_pose_auc_10(all_results, twoview_experiments, [10, 20, 50, 100, 200, 500, 1000], title, err_fun=err_fun)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_outliers():
@@ -280,12 +280,14 @@ def generate_refinement_graph():
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
-    generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
-    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+
+    ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments)
     #
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)

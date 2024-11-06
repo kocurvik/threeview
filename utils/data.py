@@ -24,8 +24,6 @@ iterations_list = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 #                    '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM',
 #                    '4pH', '4pH + ENM']
 
-twoview_experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '3pH(A)', '2pE(A)', '4pH']
-
 styles = {exp: 'dashed' if 'O' in exp else 'solid' for exp in experiments}
 # colors[experiments[7]] = sns.color_palette("tab10")[9]
 
