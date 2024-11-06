@@ -216,7 +216,7 @@ def generate_graphs_twoview(dataset, results_type, all=True):
 
     if all:
         title = f'twoview_{dataset}_{results_type}'
-        draw_results_pose_auc_10(results, twoview_experiments, iterations_list, title, err_fun=err_fun)
+        draw_results_pose_auc_10(all_results, twoview_experiments, iterations_list, title, err_fun=err_fun)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_outliers():
