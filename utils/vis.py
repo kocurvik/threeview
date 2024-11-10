@@ -125,6 +125,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
         # plt.savefig(f'figs/{title}_pose.pdf', bbox_inches='tight', pad_inches=0)
         plt.savefig(f'figs/{title}_pose.pdf')#, bbox_inches='tight', pad_inches=0)
 
+        plt.legend()
         plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0.1)
         print(f'saved pose: {title}')
 
@@ -285,20 +286,20 @@ if __name__ == '__main__':
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
     generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
 
     generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
 
     generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
+    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
+    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
+    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     #
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
