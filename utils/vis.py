@@ -11,7 +11,7 @@ from tqdm import tqdm
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview
 
-experiments = ['4p(HC)', '5p3v', '4p3v(A) + ENM', '3p3v(A) + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
+experiments = ['4p(HC)', '5p3v', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
