@@ -11,7 +11,7 @@ from tqdm import tqdm
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview
 
-experiments = ['4p(HC)', '5p3v', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
+experiments = ['4p(HC)', '5p3v', '4p3v(A) + ENM', '3p3v(A) + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
 
 large_size = 24
 small_size = 20
@@ -284,6 +284,17 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
+    generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True,)
+    generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True,)
+
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True,)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True,)
+
+    generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True,)
+    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True,)
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
     generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
