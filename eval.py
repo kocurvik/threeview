@@ -273,6 +273,9 @@ def eval(args):
     if args.rc:
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(A)', '4p3v(A) + R']
 
+    if args.final:
+        experiments = ['4p3v(M) + R + C', '4p3v(M-D) + R + C', '5p3v', '4p(HC)', '3p3v(A) + ENM', '4p3v(A) + ENM']
+
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
