@@ -161,11 +161,10 @@ def run_synth():
     # c = np.array([f1, y, 0])
     t12 = -R12 @ c1
     t13 = -R13 @ c2
-    t12 = np.array([1, 0, 0])
-    t13 = np.array([-1, 0, 0])
+    # t12 = np.array([1, 0, 0])
+    # t13 = np.array([-1, 0, 0])
 
-    # x1, x2, x3, X = get_scene(f, R12, t12, R13, t13, 100, min_distance=50000, depth=1)
-    x1, x2, x3, X = get_para_scene(f, R12, t12, R13, t13, 100, min_distance=2, depth=1)
+    x1, x2, x3, X = get_scene(f, R12, t12, R13, t13, 100, min_distance=2, depth=1)
 
     sigma = 0.0
 
@@ -230,24 +229,16 @@ def run_synth():
     print(R13)
     print(t13 / np.linalg.norm(t13))
 
-    models = poselib.para_4pt_solver(x1, x2, x3, 10)
-
-    for i, pose in enumerate(models):
-        print(f"Model {i}")
-        print(rotation_angle(pose.pose12.R.T @ R12))
-        print(rotation_angle(pose.pose13.R.T @ R13))
-        print(rotation_angle(pose.pose23().R.T @ R23))
-
-        print(angle(pose.pose12.t, t12))
-        print(angle(pose.pose13.t, t13))
-        print(angle(pose.pose23().t, t23))
-
-
-
-    ransac_dict = {'max_epipolar_error': 2.0, 'progressive_sampling': False,
-                   'min_iterations': 100, 'max_iterations': 100, 'lo_iterations': 0,
+    ransac_dict = {'max_epipolar_error': 0.5, 'progressive_sampling': False,
+                   'min_iterations': 100, 'max_iterations': 100, 'lo_iterations': 25,
                    'inner_refine': False, 'threeview_check': False, 'sample_sz': 4,
-                   'delta': 0.0, 'use_hc': False, 'use_para': True}
+                   'delta': 0.0, 'use_hc': False, 'use_para': False}
+
+    ransac_dict['gt_E'] = skew(t12) @ R12
+
+    print(ransac_dict['gt_E'] / np.linalg.norm(ransac_dict['gt_E']))
+    ransac_dict['use_nister'] = 1
+    ransac_dict['early_nonminimal'] = False
 
     # pose, out5 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'verbose': False})
     # print("Rot errs 5p")
@@ -255,7 +246,7 @@ def run_synth():
     # print(rotation_angle(pose.pose13.R.T @ R13))
     #
     ransac_dict['sample_sz'] = 4
-    ransac_dict['use_affine'] = False
+
     pose, out4 = poselib.estimate_three_view_relative_pose(x1, x2, x3, camera_dict, camera_dict, camera_dict, ransac_dict, {'max_iterations': 0, 'verbose': False})
     print("Rot errs 4p")
     print(rotation_angle(pose.pose12.R.T @ R12))
