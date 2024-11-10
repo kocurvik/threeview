@@ -237,10 +237,15 @@ def eval(args):
                        '4p3v(A)', '3p3v(A)', '2p3v(A)', '4p3v(A) + nLO', '3p3v(A) + nLO', '2p3v(A) + nLO']
 
     else:
-        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M) + C',
-                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + C',
-                       '4p(HC)', '5p3v', '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
-                       '4p3v(A)', '4p3v(A) + R + C', '3p3v(A)', '2p3v(A)']
+        experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
+                       '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C',
+                       '4p(HC)', '5p3v',
+                       '4p3v(O)', '4p3v(O) + R', '4p3v(O) + R + C',
+                       '4p3v(A)', '4p3v(A) + R', '4p3v(A) + R + C',
+                       '3p3v(A)', '2p3v(A)',
+                       '4p3v(A) + ENM', '4p3v(A) + R + ENM', '4p3v(A) + R + C + ENM',
+                       '3p3v(A) + ENM', '2p3v(A) + ENM',
+                       '4p3v(N1)', '4p3v(N3)', '4p3v(N1) + ENM', '4p3v(N3) + ENM']
 
     if args.learning:
         experiments = ['4p3v(L) + R + C', '4p3v(L-D) + R + C', '4p3v(L-ID) + R + C',
