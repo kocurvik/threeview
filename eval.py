@@ -284,7 +284,7 @@ def eval(args):
 
     if args.final:
         experiments = ['4p3v(M) + R + C', '4p3v(M-D) + R + C', '5p3v', '4p(HC)',
-                       '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '3p3v(A) + ENM']
+                       '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '3p3v(A)']
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
@@ -378,6 +378,7 @@ def eval(args):
                 with open(json_path, 'r') as f:
                     prev_results = json.load(f)
             else:
+                print("Prev file not found!")
                 prev_results = []
 
             if args.overwrite:
