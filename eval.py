@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument('-d', '--delta', action='store_true', default=False)
     parser.add_argument('-a', '--append', action='store_true', default=False)
     parser.add_argument('-o', '--overwrite', action='store_true', default=False)
+    parser.add_argument('-cp', '--check_previous', action='store_true', default=False)
     parser.add_argument('-e', '--early', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
     parser.add_argument('--oracles', action='store_true', default=False)
@@ -137,6 +138,13 @@ def eval_experiment(x):
     early_lm = '+ ELM' in experiment
     early_nm = '+ ENM' in experiment
 
+    if 'N1' in experiment:
+        nister = 1
+    elif 'N3' in experiment:
+        nister = 2
+    else:
+        nister = 0
+
     # using R
     inner_refine = 2 if '+ R' in experiment else 0
     if '+ R(' in experiment:
@@ -166,7 +174,8 @@ def eval_experiment(x):
                    'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
-                   'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para}
+                   'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para,
+                   'nister': nister}
 
     if iterations is not None:
         ransac_dict['min_iterations'] = iterations
@@ -274,14 +283,32 @@ def eval(args):
         experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(A)', '4p3v(A) + R']
 
     if args.final:
-        experiments = ['4p3v(M) + R + C', '4p3v(M-D) + R + C', '5p3v', '4p(HC)', '3p3v(A) + ENM', '4p3v(A) + ENM']
-
+        experiments = ['4p3v(M) + R + C', '4p3v(M-D) + R + C', '5p3v', '4p(HC)', '4p3v(A) + ENM']
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
 
     json_path = os.path.join('results', f'{basename}-{matches_basename}.json')
     print(f'json_path: {json_path}')
+
+    if args.check_previous:
+        print("Checking previous!")
+        if os.path.exists(json_path):
+            if not args.append:
+                raise ValueError("Ran check previous without append when the results file already exists! Aborting!")
+
+            with open(json_path, 'r') as f:
+                prev_results = json.load(f)
+
+            prev_experiments = set([x['experiment'] for x in prev_results])
+
+            experiments = list(set(experiments).difference(prev_experiments))
+
+            print("Some experiments already found. Only performing experiments: ", experiments)
+        else:
+            print("Prev file not found")
+
+    print("Experiments: ", experiments)
 
     if args.load:
         with open(json_path, 'r') as f:
@@ -344,15 +371,18 @@ def eval(args):
 
         print("Done")
 
-    if args.append:
-        print(f"Appending from: {json_path}")
-        with open(json_path, 'r') as f:
-            prev_results = json.load(f)
+        if args.append:
+            if os.path.exists(json_path):
+                print(f"Appending from: {json_path}")
+                with open(json_path, 'r') as f:
+                    prev_results = json.load(f)
+            else:
+                prev_results = []
 
-        if args.overwrite:
-            prev_results = [x for x in prev_results if x['experiment'] not in experiments]
+            if args.overwrite:
+                prev_results = [x for x in prev_results if x['experiment'] not in experiments]
 
-        results.extend(prev_results)
+            results.extend(prev_results)
 
     fix_ch_err(results)
 
