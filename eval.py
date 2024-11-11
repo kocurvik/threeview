@@ -37,6 +37,7 @@ def parse_args():
     parser.add_argument('--learning', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
     parser.add_argument('--final', action='store_true', default=False)
+    parser.add_argument('--nister', action='store_true', default=False)
     parser.add_argument('--rc', action='store_true', default=False)
     parser.add_argument('-r', '--refine', action='store_true', default=False)
     parser.add_argument('--all', action='store_true', default=False)
@@ -291,6 +292,8 @@ def eval(args):
         experiments = ['4p3v(M) + R + C', '4p3v(M-D) + R + C', '5p3v', '4p(HC)',
                        '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '5p3v + ENM',
                        '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '3p3v(A)']
+    if args.nister:
+        experiments = ['4p3v(N1)', '4p3v(N3)', '4p3v(N1) + ENM', '4p3v(N3) + ENM']
 
     # experiments.extend([x + ' + C' for x in experiments])
     # experiments.extend([x + ' + R' for x in experiments])
