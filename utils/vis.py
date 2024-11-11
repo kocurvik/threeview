@@ -285,6 +285,7 @@ def generate_refinement_graph():
 
 
 def generate_join_graphs(dataset, basenames = None):
+    plt.figure()
     if basenames is None:
         basenames = get_basenames(dataset)
 
