@@ -182,7 +182,7 @@ def eval_experiment(x):
         ransac_dict['min_iterations'] = iterations
         ransac_dict['max_iterations'] = iterations
 
-    if oracle:
+    if oracle or nister > 0:
         gt_E = get_gt_E(img1, img2, R_dict, T_dict, camera_dicts)
         ransac_dict['gt_E'] = gt_E
 
