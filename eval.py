@@ -176,7 +176,7 @@ def eval_experiment(x):
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
                    'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para,
-                   'nister': nister}
+                   'use_nister': nister}
 
     if iterations is not None:
         ransac_dict['min_iterations'] = iterations
