@@ -288,7 +288,7 @@ def generate_join_graphs(dataset, basenames = None):
     if basenames is None:
         basenames = get_basenames(dataset)
 
-    exps = ['4p3v(A) + ENM'  '4p3v(M-D) + R + C + ENM', '4p3v(M-D) + R + C']
+    exps = ['4p3v(A) + ENM', '4p3v(M-D) + R + C + ENM', '4p3v(M-D) + R + C']
 
     colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(exps)}
     styles = {'3.0': 'dotted', '5.0': 'dashed', '10.0': 'solid'}
