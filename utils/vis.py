@@ -38,7 +38,7 @@ def get_colors_styles(experiments):
 
     # base_experiments = experiments
     # colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
-    base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
+    base_colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
 
     colors = {}
     print(base_colors)
