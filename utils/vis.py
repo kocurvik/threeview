@@ -11,7 +11,8 @@ from tqdm import tqdm
 from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max, \
     err_twoview
 
-experiments = ['4p(HC)', '5p3v', '4p3v(A) + R + C + ENM', '3p3v(A) + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C']
+experiments = ['4p(HC)', '5p3v', '5p3v + ENM', '4p3v(A) + R + C + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C',
+               '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM']
 
 large_size = 24
 small_size = 20
@@ -28,28 +29,30 @@ plt.rcParams.update({'figure.autolayout': True})
 # plt.rcParams['mathtext.it'] = 'Times New Roman:italic'
 # plt.rcParams['mathtext.bf'] = 'Times New Roman:bold'
 
-def get_colors_styles(experiments):
-    # base_experiments = list(sorted(list(set([x.split(' ')[0] for x in experiments]))))
-    base_experiments = experiments
-    colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
-    # base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
 
-    print(colors)
+def get_colors_styles(experiments):
+    base_experiments = [x.split(' ')[0] for x in experiments]
+    a = np.array(base_experiments)
+    _, idx = np.unique(a, return_index=True)
+    base_experiments = a[np.sort(idx)]
+
+    # base_experiments = experiments
+    # colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(base_experiments)}
+    base_colors = {exp: sns.color_palette("hsl", len(base_experiments)).as_hex()[i] for i, exp in enumerate(base_experiments)}
+
+    colors = {}
+    print(base_colors)
 
     styles = {}
     for exp in experiments:
-        # if len(exp.split(' ')) == 1:
-        #     styles[exp] = 'solid'
-        # else:
-        #     suffix = ' '.join(exp.split(' ')[1:])
-        #     if 'ENM' in suffix:
-        #         styles[exp] = 'dotted'
-        #     else:
-        #         styles[exp] = 'solid'
-        # styles[exp] = 'dotted' if 'ENM' in exp else 'solid'
-        styles[exp] = 'solid'
+        if 'ENM' in exp:
+            styles[exp] = 'dashed'
+        else:
+            styles[exp] = 'solid'
+        colors[exp] = base_colors[exp.split(' ')[0]]
 
     return colors, styles
+
 
 def draw_results(results, experiments, iterations_list, title=''):
     plt.figure()
@@ -85,7 +88,7 @@ def draw_results(results, experiments, iterations_list, title=''):
     plt.show()
 
 
-def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, xlim=(5.0, 1.9e4), err_fun=err_fun_main):
+def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, ylim=None, err_fun=err_fun_main):
     fig = plt.figure(frameon=True)
 
     colors, styles = get_colors_styles(experiments)
@@ -115,6 +118,8 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
 
     # plt.xlim(xlim)
     # plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
+    if ylim is not None:
+        plt.ylim(ylim)
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
     plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
     plt.tick_params(axis='x', which='major', labelsize=small_size)
@@ -173,7 +178,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix=''):
+def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix='', ylim=None):
     if basenames is None:
         basenames = get_basenames(dataset)
 
@@ -183,8 +188,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in exps]
-            draw_results_pose_auc_10(results, exps, iterations_list,
-                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+            # draw_results_pose_auc_10(results, exps, iterations_list,
+            #                          f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -192,8 +197,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main)
-        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main, ylim=ylim)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max, ylim=ylim)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
@@ -289,17 +294,17 @@ if __name__ == '__main__':
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('aachen', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('cambridge', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('aachen', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
 
-    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('cambridge', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
 
-    # generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
-    # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
