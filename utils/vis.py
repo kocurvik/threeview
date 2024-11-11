@@ -329,7 +329,7 @@ def generate_join_graphs(dataset, basenames = None):
     plt.tick_params(axis='y', which='major', labelsize=small_size)
     plt.savefig(f'figs/{title}_pose.pdf')#, bbox_inches='tight', pad_inches=0)
 
-    plt.legend()
+    # plt.legend()
     plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0.1)
     print(f'saved pose: {title}')
 
