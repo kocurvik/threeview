@@ -283,6 +283,57 @@ def generate_refinement_graph():
     plt.legend(title='LM Iterations',loc=4, prop={'size': small_size}, title_fontproperties={'size': small_size})
     plt.savefig(f'figs/st_peters_square_refinement_validation.pdf', bbox_inches='tight', pad_inches=0)
 
+
+def generate_join_graphs(dataset, basenames = None):
+    if basenames is None:
+        basenames = get_basenames(dataset)
+
+    exps = ['4p3v(A) + ENM'  '4p3v(M-D) + R + C + ENM', '4p3v(M-D) + R + C']
+
+    colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(exps)}
+    styles = {'3.0': 'dotted', '5.0': 'dashed', '10.0': 'solid'}
+
+    for t in ['3.0', '5.0', '10.0']:
+        all_results = []
+
+        for basename in basenames:
+            json_path = os.path.join('results', f'{basename}-graph-{t}t-triplets-features_superpoint_noresize_2048-LG.json')
+            print(f'json_path: {json_path}')
+            with open(json_path, 'r') as f:
+                results = [x for x in json.load(f) if x['experiment'] in exps]
+
+               all_results.extend(results)
+
+        for experiment in tqdm(exps):
+            experiment_results = [x for x in all_results if x['experiment'] == experiment]
+
+            xs = []
+            ys = []
+
+            for iterations in iterations_list:
+                iter_results = [x for x in experiment_results if x['info']['iterations'] == iterations]
+                mean_runtime = np.mean([x['info']['runtime'] for x in iter_results])
+                errs = np.array([err_fun_main(out) for out in iter_results])
+                errs[np.isnan(errs)] = 180
+                AUC10 = np.mean(np.array([np.sum(errs < t) / len(errs) for t in range(1, 11)]))
+
+                xs.append(mean_runtime)
+                ys.append(AUC10)
+
+            plt.semilogx(xs, ys, label=f'{experiment} @ {t}px', marker='*', color=colors[experiment], linestyle=styles[t])
+
+    title = f'joint_graph_{dataset}'
+    plt.xlabel('Mean runtime (ms)', fontsize=large_size)
+    plt.ylabel('AUC@10$^\\circ$', fontsize=large_size)
+    plt.tick_params(axis='x', which='major', labelsize=small_size)
+    plt.tick_params(axis='y', which='major', labelsize=small_size)
+    plt.savefig(f'figs/{title}_pose.pdf')#, bbox_inches='tight', pad_inches=0)
+
+    plt.legend()
+    plt.savefig(f'figs/{title}_pose.png', bbox_inches='tight', pad_inches=0.1)
+    print(f'saved pose: {title}')
+
+
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
@@ -302,9 +353,13 @@ if __name__ == '__main__':
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
     # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
 
-    generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    # generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
     # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_join_graphs('aachen')
+    generate_join_graphs('cambridge')
+    generate_join_graphs('pt')
+
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
