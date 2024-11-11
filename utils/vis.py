@@ -294,17 +294,17 @@ if __name__ == '__main__':
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('aachen', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
-    generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    # generate_graphs('aachen', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    # generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
 
-    generate_graphs('cambridge', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
-    generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    # generate_graphs('cambridge', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
 
-    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
-    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
-    generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
 
     ablation_experiments = ['4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
