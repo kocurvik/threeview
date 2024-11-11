@@ -301,8 +301,7 @@ def generate_join_graphs(dataset, basenames = None):
             print(f'json_path: {json_path}')
             with open(json_path, 'r') as f:
                 results = [x for x in json.load(f) if x['experiment'] in exps]
-
-               all_results.extend(results)
+            all_results.extend(results)
 
         for experiment in tqdm(exps):
             experiment_results = [x for x in all_results if x['experiment'] == experiment]
