@@ -188,8 +188,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
         print(f'json_path: {json_path}')
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in exps]
-            # draw_results_pose_auc_10(results, exps, iterations_list,
-            #                          f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+            draw_results_pose_auc_10(results, exps, iterations_list,
+                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -349,15 +349,15 @@ if __name__ == '__main__':
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
 
     # generate_graphs('aachen', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
-    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
+    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('aachen', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.548, 0.579))
 
     # generate_graphs('cambridge', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
-    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
+    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('cambridge', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.645, 0.685))
 
     # generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
-    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
     generate_join_graphs('aachen')
     generate_join_graphs('cambridge')
