@@ -20,7 +20,7 @@ incdec = [1, 1, -1, -1, -1, 1]
 names = {
         '4p(HC)' : '\\sfhc~\\cite{Hruby_cvpr2022}',
         '5p3v': '\\midrule\\sft',
-        '5p3v + ENM': '\\midrule\\sft',
+        '5p3v + ENM': '\\sftENM',
         # '5p3v + ENM': '\\midrule\\sftnm',
         # '5p3v + ELM': '\\midrule\\sftlm',
         '4p3v(A)' : '\\midrule \\sfaf',
