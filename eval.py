@@ -34,6 +34,7 @@ def parse_args():
     parser.add_argument('-e', '--early', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
     parser.add_argument('--oracles', action='store_true', default=False)
+    parser.add_argument('--table', action='store_true', default=False)
     parser.add_argument('--learning', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
     parser.add_argument('--final', action='store_true', default=False)
@@ -252,6 +253,16 @@ def eval(args):
         experiments = ['4p3v(L) + R + C', '4p3v(L-D) + R + C', '4p3v(L-ID) + R + C',
                        '4p3v(L) + R', '4p3v(L-D) + R', '4p3v(L-ID) + R',
                        '4p3v(L)', '4p3v(L-D)', '4p3v(L-ID)']
+
+    if args.table:
+        experiments = [
+            '5p3v', '5p3v + ENM',
+            '4p3v(A)', '4p3v(A) + ENM', '4p3v(A) + R + ENM', '4p3v(A) + R + C + ENM',
+            '4p3v(A) + R', '4p3v(A) + R + C',
+            '4p3v(M)', '4p3v(M) + ENM', '4p3v(M) + R + ENM', '4p3v(M) + R + C + ENM',
+            '4p3v(M) + R', '4p3v(M) + R + C',
+            '4p3v(M-D)', '4p3v(M-D) + ENM', '4p3v(M-D) + R + ENM', '4p3v(M-D) + R + C + ENM',
+            '4p3v(M-D) + R', '4p3v(M-D) + R + C']
 
     if args.oracles:
         experiments = ['4p3v(O)', '4p3v(O) + R']
