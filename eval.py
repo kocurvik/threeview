@@ -173,7 +173,7 @@ def eval_experiment(x):
 
     num_pts = int(experiment[0])
     ransac_dict = {'max_epipolar_error': t, 'progressive_sampling': False,
-                   'min_iterations': 50, 'max_iterations': 5000, 'lo_iterations': lo_iterations,
+                   'min_iterations': 100, 'max_iterations': 1000, 'lo_iterations': lo_iterations,
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
                    'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para,
