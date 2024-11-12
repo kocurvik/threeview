@@ -256,7 +256,7 @@ def eval(args):
 
     if args.table:
         experiments = [
-            '5p3v', '5p3v + ENM',
+            '5p3v', '5p3v + ENM', '4p(HC)',
             '4p3v(A)', '4p3v(A) + ENM', '4p3v(A) + R + ENM', '4p3v(A) + R + C + ENM',
             '4p3v(A) + R', '4p3v(A) + R + C',
             '4p3v(M)', '4p3v(M) + ENM', '4p3v(M) + R + ENM', '4p3v(M) + R + C + ENM',
