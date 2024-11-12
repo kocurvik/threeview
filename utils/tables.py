@@ -61,9 +61,11 @@ names = {
 def print_table_text(experiments, rows):
 
     print(
-        f'\\begin{{tabular}}{{ l | c c | c c c | c}}\n'
+        f'\\begin{{tabular}}{{ l | c c | c c c | c | c c | c c c | c| c c | c c c | c|}}\n'
         f'    \\toprule\n'
-        f'    Estimator & AVG $(^\\circ)$ $\\downarrow$ & MED $(^\\circ)$ $\\downarrow$ & AUC@5 $\\uparrow$ & @10 $\\uparrow$ & @20 $\\uparrow$ & Runtime (ms) $\\downarrow$\\\\\n'
+        f'    Estimator & AVG $(^\\circ)$ $\\downarrow$ & MED $(^\\circ)$ $\\downarrow$ & AUC@5 $\\uparrow$ & @10 $\\uparrow$ & @20 $\\uparrow$ & Runtime (ms) $\\downarrow$'
+                      f'& AVG $(^\\circ)$ $\\downarrow$ & MED $(^\\circ)$ $\\downarrow$ & AUC@5 $\\uparrow$ & @10 $\\uparrow$ & @20 $\\uparrow$ & Runtime (ms) $\\downarrow$'
+                      f'& AVG $(^\\circ)$ $\\downarrow$ & MED $(^\\circ)$ $\\downarrow$ & AUC@5 $\\uparrow$ & @10 $\\uparrow$ & @20 $\\uparrow$ & Runtime (ms) $\\downarrow$\\\\\n'
         f'    \\midrule\n')
 
     for experiment, row in zip(experiments, rows):
@@ -114,41 +116,46 @@ def get_rows(results, order, err_fun, runtime=True):
     else:
         return [' & '.join(row[:-1]) for row in text_rows]
 
-def generate_table(dataset, feat, all_experiments=False, use_max_err=False):
-    basenames = get_basenames(dataset)
-
-    if use_max_err:
-        err_fun = err_fun_max
-    else:
-        err_fun = err_fun_main
-
+def generate_table(datasets, feat, all_experiments=False, use_max_err=False):
+    dataset_rows = {}
 
     if all_experiments:
         l_experiments = names.keys()
     else:
         l_experiments = experiments
 
+    if use_max_err:
+        err_fun = err_fun_max
+    else:
+        err_fun = err_fun_main
+
     results_type = f'triplets-features_{feat}_noresize_2048-LG'
 
-    results = []
-    for basename in basenames:
-        json_path = os.path.join('results', f'{basename}-5.0t-{results_type}.json')
-        print(f'json_path: {json_path}')
-        with open(json_path, 'r') as f:
-            results.extend([x for x in json.load(f) if x['experiment'] in l_experiments])
+    for dataset in datasets:
+        basenames = get_basenames(dataset)
+        results = []
+        for basename in basenames:
+            json_path = os.path.join('results', f'{basename}-5.0t-{results_type}.json')
+            print(f'json_path: {json_path}')
+            with open(json_path, 'r') as f:
+                results.extend([x for x in json.load(f) if x['experiment'] in l_experiments])
 
-    print("Data loaded")
+        print("Data loaded")
 
-    print(30 * '*')
-    print(30 * '*')
-    print(30 * '*')
-    print("Printing: ", dataset)
-    print(30 * '*')
+        print(30 * '*')
+        print(30 * '*')
+        print(30 * '*')
+        print("Printing: ", dataset)
+        print(30 * '*')
 
 
-    # print_results_summary(results, experiments)
+        # print_results_summary(results, experiments)
 
-    rows = get_rows(results, l_experiments, err_fun)
+        dataset_rows[dataset] = get_rows(results, l_experiments, err_fun)
+
+    rows = []
+    for i, experiment in enumerate(l_experiments):
+        rows.append(' & '.join([dataset_rows[dataset][i] for dataset in datasets]))
     print_table_text(l_experiments, rows)
 
 
