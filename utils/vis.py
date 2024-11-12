@@ -364,19 +364,20 @@ if __name__ == '__main__':
     # generate_graphs('pt', 'graph-3.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
     # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
-    # generate_join_graphs('aachen')
-    # generate_join_graphs('cambridge')
+
 
     color_exps = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM', '4p3v(AF) + R + C + ENM']
     colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)}
 
 
-    generate_join_graphs('pt', colors=colors)
+
 
 
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    #
-    # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
+
+    # generate_join_graphs('aachen')
+    # generate_join_graphs('cambridge')
+    generate_join_graphs('pt', colors=colors)
