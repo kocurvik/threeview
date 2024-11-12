@@ -88,10 +88,13 @@ def draw_results(results, experiments, iterations_list, title=''):
     plt.show()
 
 
-def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, ylim=None, err_fun=err_fun_main):
+def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, ylim=None, err_fun=err_fun_main, colors=None):
     fig = plt.figure(frameon=True)
 
-    colors, styles = get_colors_styles(experiments)
+    if colors is None:
+        colors, styles = get_colors_styles(experiments)
+    else:
+        styles = {exp: 'solid' for exp in experiments}
 
     for experiment in tqdm(experiments):
         experiment_results = [x for x in results if x['experiment'] == experiment]
@@ -178,7 +181,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix='', ylim=None):
+def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix='', ylim=None, colors=None):
     if basenames is None:
         basenames = get_basenames(dataset)
 
@@ -189,7 +192,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in exps]
             draw_results_pose_auc_10(results, exps, iterations_list,
-                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main)
+                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main, colors=colors)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -197,8 +200,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main, ylim=ylim)
-        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max, ylim=ylim)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main, ylim=ylim, colors=colors)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max, ylim=ylim, colors=colors)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
@@ -284,16 +287,17 @@ def generate_refinement_graph():
     plt.savefig(f'figs/st_peters_square_refinement_validation.pdf', bbox_inches='tight', pad_inches=0)
 
 
-def generate_join_graphs(dataset, basenames = None):
+def generate_join_graphs(dataset, basenames = None, colors=None):
     plt.figure()
     if basenames is None:
         basenames = get_basenames(dataset)
 
     exps = ['4p3v(A) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '4p3v(M-D) + R + C']
 
-    colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(exps)}
+    if colors is None:
+        colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(exps)}
 
-    styles = {'3.0': 'dotted', '5.0': 'dashed', '10.0': 'solid'}
+    styles = {'3.0': 'dotted', '5.0': 'solid', '10.0': 'dashed'}
 
     for t in ['3.0', '5.0', '10.0']:
         all_results = []
@@ -362,7 +366,12 @@ if __name__ == '__main__':
     # generate_graphs('pt', 'graph-10.0t-triplets-features_superpoint_noresize_2048-LG', all=True, ylim=(0.738, 0.803))
     # generate_join_graphs('aachen')
     # generate_join_graphs('cambridge')
-    generate_join_graphs('pt')
+
+    color_exps = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM', '4p3v(AF) + R + C + ENM']
+    colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)}
+
+
+    generate_join_graphs('pt', colors=colors)
 
 
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
