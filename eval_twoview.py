@@ -29,6 +29,7 @@ def parse_args():
     parser.add_argument('-g', '--graph', action='store_true', default=False)
     parser.add_argument('-s', '--shuffle', type=float, default=0.0)
     parser.add_argument('-a', '--append', action='store_true', default=False)
+    parser.add_argument('-cp', '--check_previous', action='store_true', default=False)
     parser.add_argument('feature_file')
     parser.add_argument('dataset_path')
 
@@ -281,7 +282,7 @@ def eval(args):
     #                '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM',
     #                '4pH', '4pH + ENM', '4pH + ELM']
 
-    experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '3pH(A)', '2pE(A)', '4pH']
+    experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '4pF(A) + ENM'] # '3pH(A)', '2pE(A)', '4pH']
 
     dataset_path = args.dataset_path
     basename = os.path.basename(dataset_path)
@@ -309,10 +310,28 @@ def eval(args):
     else:
         json_string = f'twoview-{basename}-{matches_basename}-{args.shuffle}s.json'
 
+    json_path = os.path.join('results', json_string)
+
+    if args.check_previous:
+        print("Checking previous!")
+        if os.path.exists(json_path):
+            if not args.append:
+                raise ValueError("Ran check previous without append when the results file already exists! Aborting!")
+
+            with open(json_path, 'r') as f:
+                prev_results = json.load(f)
+
+            prev_experiments = set([x['experiment'] for x in prev_results])
+
+            experiments = list(set(experiments).difference(prev_experiments))
+
+            print("Some experiments already found. Only performing experiments: ", experiments)
+        else:
+            print("Prev file not found")
 
     if args.load:
         print("Loading: ", json_string)
-        with open(os.path.join('results', json_string), 'r') as f:
+        with open(json_path, 'r') as f:
             results = json.load(f)
 
     else:
@@ -334,9 +353,17 @@ def eval(args):
         os.makedirs('results', exist_ok=True)
 
         if args.append:
-            print(f"Appending from: {os.path.join('results', json_string)}")
-            with open(os.path.join('results', json_string), 'r') as f:
-                prev_results = json.load(f)
+            if os.path.exists(json_path):
+                print(f"Appending from: {json_path}")
+                with open(json_path, 'r') as f:
+                    prev_results = json.load(f)
+            else:
+                print("Prev file not found!")
+                prev_results = []
+
+            if args.overwrite:
+                prev_results = [x for x in prev_results if x['experiment'] not in experiments]
+
             results.extend(prev_results)
 
         with open(os.path.join('results', json_string), 'w') as f:
