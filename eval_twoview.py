@@ -283,7 +283,7 @@ def eval(args):
     #                '4pF(A) + ENM', '3pH(A) + ENM', '2pE(A) + ENM',
     #                '4pH', '4pH + ENM', '4pH + ELM']
 
-    experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '4pF(A) + ENM'] # '3pH(A)', '2pE(A)', '4pH']
+    experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM', '4pF(A) + ENM'] # '3pH(A)', '2pE(A)', '4pH']
 
     dataset_path = args.dataset_path
     basename = os.path.basename(dataset_path)
