@@ -205,7 +205,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
-    twoview_experiments = ['5pE', '4pE(M)', '4pE(M-D)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM', '4pF(A) + ENM']
+    twoview_experiments = ['5pE', '4pE(M)', '4pE(M-D)', '4pF(A) + ENM']
 
     basenames = get_basenames(dataset)
 
