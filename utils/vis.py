@@ -88,7 +88,7 @@ def draw_results(results, experiments, iterations_list, title=''):
     plt.show()
 
 
-def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, ylim=None, err_fun=err_fun_main, colors=None, thickness=1):
+def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, ylim=None, err_fun=err_fun_main, colors=None):
     fig = plt.figure(frameon=True)
 
     if colors is None:
@@ -117,7 +117,7 @@ def draw_results_pose_auc_10(results, experiments, iterations_list, title=None, 
 
         # colors = {exp: sns.color_palette("hls", len(experiments))[i] for i, exp in enumerate(experiments)}
 
-        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment], thickness=thickness)
+        plt.semilogx(xs, ys, label=experiment, marker='*', color=colors[experiment], linestyle=styles[experiment])
 
     # plt.xlim(xlim)
     # plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.2f}'))
@@ -181,7 +181,7 @@ def draw_results_pose_portion(results, experiments, iterations_list, title=None)
         plt.legend()
         plt.show()
 
-def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix='', **kwargs):
+def generate_graphs(dataset, results_type, all=True, basenames = None, exps=experiments, prefix='', ylim=None, colors=None):
     if basenames is None:
         basenames = get_basenames(dataset)
 
@@ -192,7 +192,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
         with open(json_path, 'r') as f:
             results = [x for x in json.load(f) if x['experiment'] in exps]
             draw_results_pose_auc_10(results, exps, iterations_list,
-                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main, **kwargs)
+                                     f'{prefix}{dataset}_{basename}_{results_type}', err_fun=err_fun_main, colors=colors)
             # draw_results_pose_auc_10(results, experiments, iterations_list,
             #                          f'maxerr_{dataset}_{basename}_{results_type}', err_fun=err_fun_max)
             if all:
@@ -200,8 +200,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
 
     if all:
         title = f'{dataset}_{results_type}'
-        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main, **kwargs)
-        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max, **kwargs)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, prefix + title, err_fun=err_fun_main, ylim=ylim, colors=colors)
+        draw_results_pose_auc_10(all_results, exps, iterations_list, 'maxerr_' + prefix + title, err_fun=err_fun_max, ylim=ylim, colors=colors)
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
@@ -287,7 +287,7 @@ def generate_refinement_graph():
     plt.savefig(f'figs/st_peters_square_refinement_validation.pdf', bbox_inches='tight', pad_inches=0)
 
 
-def generate_join_graphs(dataset, basenames = None, colors=None, thickness=1):
+def generate_join_graphs(dataset, basenames = None, colors=None):
     plt.figure()
     if basenames is None:
         basenames = get_basenames(dataset)
@@ -325,7 +325,7 @@ def generate_join_graphs(dataset, basenames = None, colors=None, thickness=1):
                 xs.append(mean_runtime)
                 ys.append(AUC10)
 
-            plt.semilogx(xs, ys, label=f'{experiment} @ {t}px', marker='*', color=colors[experiment], linestyle=styles[t], thickness=thickness)
+            plt.semilogx(xs, ys, label=f'{experiment} @ {t}px', marker='*', color=colors[experiment], linestyle=styles[t])
 
     title = f'joint_graph_{dataset}'
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
@@ -345,7 +345,7 @@ def generate_join_graphs(dataset, basenames = None, colors=None, thickness=1):
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
-    # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
@@ -373,8 +373,8 @@ if __name__ == '__main__':
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors, thickness=2)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
 
     # generate_join_graphs('aachen')
     # generate_join_graphs('cambridge')
-    generate_join_graphs('pt', colors=colors, thickness=2)
+    generate_join_graphs('pt', colors=colors)
