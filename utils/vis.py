@@ -287,7 +287,7 @@ def generate_refinement_graph():
     plt.savefig(f'figs/st_peters_square_refinement_validation.pdf', bbox_inches='tight', pad_inches=0)
 
 
-def generate_join_graphs(dataset, basenames = None, colors=None, linewidth=1):
+def generate_join_graphs(dataset, basenames = None, colors=None, line_width=1):
     plt.figure()
     if basenames is None:
         basenames = get_basenames(dataset)
@@ -325,7 +325,7 @@ def generate_join_graphs(dataset, basenames = None, colors=None, linewidth=1):
                 xs.append(mean_runtime)
                 ys.append(AUC10)
 
-            plt.semilogx(xs, ys, label=f'{experiment} @ {t}px', marker='*', color=colors[experiment], linestyle=styles[t], linewidth=linewidth)
+            plt.semilogx(xs, ys, label=f'{experiment} @ {t}px', marker='*', color=colors[experiment], linestyle=styles[t], line_width=line_width)
 
     title = f'joint_graph_{dataset}'
     plt.xlabel('Mean runtime (ms)', fontsize=large_size)
@@ -373,8 +373,8 @@ if __name__ == '__main__':
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors, linewidth=2)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors, line_width=2)
 
     # generate_join_graphs('aachen')
     # generate_join_graphs('cambridge')
-    generate_join_graphs('pt', colors=colors, linewidth=2)
+    generate_join_graphs('pt', colors=colors, line_width=2)
