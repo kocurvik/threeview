@@ -287,7 +287,7 @@ def generate_refinement_graph():
     plt.savefig(f'figs/st_peters_square_refinement_validation.pdf', bbox_inches='tight', pad_inches=0)
 
 
-def generate_join_graphs(dataset, basenames = None, colors=None, linewidth=1):
+def generate_join_graphs(dataset, basenames = None, colors=None, linewidth=1.5):
     plt.figure()
     if basenames is None:
         basenames = get_basenames(dataset)
@@ -373,8 +373,8 @@ if __name__ == '__main__':
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors, linewidth=2)
+    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors, linewidth=3.5)
 
     # generate_join_graphs('aachen')
     # generate_join_graphs('cambridge')
-    generate_join_graphs('pt', colors=colors, linewidth=2)
+    generate_join_graphs('pt', colors=colors, linewidth=3.5)
