@@ -14,8 +14,8 @@ from utils.data import iterations_list, get_basenames, err_fun_main, err_fun_max
 experiments = ['4p(HC)', '5p3v', '5p3v + ENM', '4p3v(A) + R + C + ENM', '4p3v(M) + R + C', '4p3v(M-D) + R + C',
                '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM']
 
-large_size = 24
-small_size = 20
+large_size = 16
+small_size = 14
 
 plt.rcParams.update({'figure.autolayout': True})
 
@@ -205,7 +205,7 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
-    twoview_experiments = ['', '5pE', '4pF(A) + ENM', '4pE(M)', '4pE(M-D)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM']
+    twoview_experiments = ['', '5pE', '4pF(A)', '4pF(A) + ENM', '4pE(M)', '4pE(M-D)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM']
 
 
     basenames = get_basenames(dataset)
@@ -352,13 +352,13 @@ if __name__ == '__main__':
     # colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)}
     # colors.update({f'{exp} + ENM': sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)})
 
-    # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+    generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('pt', 'graph-0.4inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
-    generate_graphs('pt', 'graph-0.6inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
-    generate_graphs('pt', 'graph-0.8inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
+    # generate_graphs('pt', 'graph-0.4inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
+    # generate_graphs('pt', 'graph-0.6inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
+    # generate_graphs('pt', 'graph-0.8inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
 
     # generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
