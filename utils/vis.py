@@ -356,6 +356,10 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
+    generate_graphs('pt', 'graph-0.4inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
+    generate_graphs('pt', 'graph-0.6inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
+    generate_graphs('pt', 'graph-0.8inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
+
     # generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('pt', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
@@ -378,8 +382,8 @@ if __name__ == '__main__':
     colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)}
 
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
-    generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
-    generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
+    # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
+    # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
     # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
 
     # generate_join_graphs('aachen')
