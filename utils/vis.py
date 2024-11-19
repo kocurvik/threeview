@@ -356,9 +356,9 @@ if __name__ == '__main__':
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
-    generate_graphs('pt', 'graph-0.4inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
-    generate_graphs('pt', 'graph-0.6inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
-    generate_graphs('pt', 'graph-0.8inliers-5.0t-triplets-features_superpoint_noresize_2048-LG.json', basenames=['notre_dame_front_facade'])
+    generate_graphs('pt', 'graph-0.4inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
+    generate_graphs('pt', 'graph-0.6inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
+    generate_graphs('pt', 'graph-0.8inliers-5.0t-triplets-features_superpoint_noresize_2048-LG', basenames=['notre_dame_front_facade'])
 
     # generate_graphs('aachen', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs('cambridge', 'graph-triplets-features_superpoint_noresize_2048-LG', all=True)
