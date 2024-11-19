@@ -205,7 +205,8 @@ def generate_graphs(dataset, results_type, all=True, basenames = None, exps=expe
     # draw_results_pose_portion(results, experiments, iterations_list, title)
 
 def generate_graphs_twoview(dataset, results_type, all=True):
-    twoview_experiments = ['5pE', '4pE(M)', '4pE(M-D)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM', '4pF(A) + ENM']
+    twoview_experiments = ['', '5pE', '4pF(A) + ENM', '4pE(M)', '4pE(M-D)', '5pE + ENM', '4pE(M) + ENM', '4pE(M-D) + ENM']
+
 
     basenames = get_basenames(dataset)
 
@@ -345,7 +346,13 @@ def generate_join_graphs(dataset, basenames = None, colors=None):
 if __name__ == '__main__':
     # generate_outliers()
     # generate_refinement_graph()
-    # generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
+
+    # color_exps = [' ', '5pE', '4pF(A)', '4p(M)', '4p(M-D)']
+    # color_exps = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM', '4p3v(A) + R + C + ENM']
+    # colors = {exp: sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)}
+    # colors.update({f'{exp} + ENM': sns.color_palette().as_hex()[i] for i, exp in enumerate(color_exps)})
+
+    generate_graphs_twoview('pt', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('cambridge', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
     # generate_graphs_twoview('indoor6', '5.0t-graph-pairs-features_superpoint_noresize_2048-LG', all=True)
 
@@ -373,8 +380,8 @@ if __name__ == '__main__':
     ablation_experiments = ['4p3v(M)', '4p3v(M-D)', '4p3v(M-D) + R', '4p3v(M-D) + R + C', '4p3v(M-D) + R + C + ENM']
     # generate_graphs('aachen', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
     # generate_graphs('cambridge', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_')
-    generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
+    # generate_graphs('pt', 'graph-5.0t-triplets-features_superpoint_noresize_2048-LG', all=True, exps=ablation_experiments, prefix='ablation_', colors=colors)
 
     # generate_join_graphs('aachen')
     # generate_join_graphs('cambridge')
-    generate_join_graphs('pt', colors=colors)
+    # generate_join_graphs('pt', colors=colors)
