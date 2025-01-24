@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument('-e', '--early', action='store_true', default=False)
     parser.add_argument('--affine', action='store_true', default=False)
     parser.add_argument('--oracles', action='store_true', default=False)
-    parser.add_argument('--reuttal', action='store_true', default=False)
+    parser.add_argument('--rebuttal', action='store_true', default=False)
     parser.add_argument('--table', action='store_true', default=False)
     parser.add_argument('--learning', action='store_true', default=False)
     parser.add_argument('--toptim', action='store_true', default=False)
