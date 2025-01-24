@@ -305,7 +305,7 @@ def eval(args):
                        '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '5p3v + ENM',
                        '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '3p3v(A)']
     if args.rebuttal:
-        experiments = ['5p3v + ENM + R + C']
+        experiments = ['5p3v + ENM + R + C', '5p3v + R + C']
 
     if args.nister:
         experiments = ['4p3v(N1)', '4p3v(N3)', '4p3v(N1) + ENM', '4p3v(N3) + ENM']
