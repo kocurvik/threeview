@@ -5,8 +5,9 @@ import numpy as np
 from prettytable import PrettyTable
 
 from eval import print_results_summary
-from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main, \
-    experiments
+from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main
+
+experiments = ['4p(HC)', '5p3v', '5p3v + ENM', '5p3v + ENM + R + C','4p3v(A) + R + C + ENM', '4p3v(M) + R + C + ENM','4p3v(M-D) + R + C + ENM',]
 
 incdec = [1, 1, -1, -1, 1]
 
