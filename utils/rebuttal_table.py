@@ -8,7 +8,7 @@ from eval import print_results_summary
 from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main, \
     experiments
 
-incdec = [1, 1, -1, -1, -1, 1]
+incdec = [1, 1, -1, -1, 1]
 
 # experiments = ['4p(HC)', '5p3v',
 #                '4p3v(M)', '4p3v(M) + R', '4p3v(M) + R + C',
