@@ -7,7 +7,7 @@ from prettytable import PrettyTable
 from eval import print_results_summary
 from utils.data import basenames_pt, basenames_eth, basenames_cambridge, get_basenames, err_fun_max, err_fun_main
 
-experiments = ['4p(HC)', '5p3v', '5p3v + ENM', '5p3v + ENM + R + C','4p3v(A) + R + C + ENM', '4p3v(M) + R + C + ENM','4p3v(M-D) + R + C + ENM',]
+experiments = ['4p(HC)', '5p3v', '5p3v + ENM', '5p3v + ENM + R + C','5p3v + ENM + RR + CC',' 4p3v(A) + R + C + ENM', '4p3v(M) + R + C + ENM','4p3v(M-D) + R + C + ENM',]
 
 incdec = [1, 1, -1, -1, 1]
 
@@ -23,7 +23,9 @@ names = {
         '5p3v': '\\midrule\\sft',
         '5p3v + ENM': '\\sftENM',
         '5p3v + R + C': '\\sftRC',
+        '5p3v + RR + CC': '\\sftRRCC',
         '5p3v + ENM + R + C': '\\sftRCENM',
+        '5p3v + ENM + RR + CC': '\\sftRRCCENM',
         # '5p3v + ENM': '\\midrule\\sftnm',
         # '5p3v + ELM': '\\midrule\\sftlm',
         '4p3v(A)' : '\\midrule \\sfaf',
@@ -66,8 +68,8 @@ def print_table_text(experiments, rows):
     print(
         f'\\begin{{tabular}}{{ l | c c | c c | c | c c | c c | c |}}\n'
         f'    \\toprule\n'
-        f'    Estimator & AVG $(^\\circ)$ & MED $(^\\circ)$ & AUC@5 & @10 & Time '
-                      f'& AVG $(^\\circ)$ & MED $(^\\circ)$ & AUC@5 & @10 & Time \\\\\n'
+        f'    Estimator & AVG & MED & AUC@5 & @10 & Time '
+                      f'& AVG & MED & AUC@5 & @10 & Time \\\\\n'
         f'    \\midrule\n')
 
     for experiment, row in zip(experiments, rows):

@@ -155,6 +155,9 @@ def eval_experiment(x):
         idx_end = experiment[idx+2:].find(')')
         inner_refine = int(experiment[idx+2:idx + 2 + idx_end])
 
+    inner_refine_extra = 1 if '+ RR' in experiment else 0
+    threeview_check_extra = '+ CC' in experiment
+
 
     lo_iterations = 0 if '+ nLO' in experiment else 25
 
@@ -178,7 +181,8 @@ def eval_experiment(x):
                    'inner_refine': inner_refine, 'threeview_check': threeview_check, 'sample_sz': num_pts,
                    'delta': delta, 'use_hc': use_hc, 'use_net': use_net, 'init_net': init_net, 'oracle': oracle,
                    'use_affine': affine, 'early_lm': early_lm, 'early_nonminimal': early_nm, 'use_para': use_para,
-                   'use_nister': nister}
+                   'use_nister': nister, 'inner_refine_extra': inner_refine_extra,
+                   'threeview_check_extra': threeview_check_extra}
 
     if iterations is not None:
         ransac_dict['min_iterations'] = iterations
@@ -305,7 +309,7 @@ def eval(args):
                        '4p3v(M) + R + C + ENM', '4p3v(M-D) + R + C + ENM', '5p3v + ENM',
                        '4p3v(A) + R + C + ENM', '4p3v(A) + R + C', '3p3v(A) + ENM', '3p3v(A)']
     if args.rebuttal:
-        experiments = ['5p3v + ENM + R + C', '5p3v + R + C']
+        experiments = ['5p3v + ENM + RR + CC', '5p3v + RR + CC']
 
     if args.nister:
         experiments = ['4p3v(N1)', '4p3v(N3)', '4p3v(N1) + ENM', '4p3v(N3) + ENM']
