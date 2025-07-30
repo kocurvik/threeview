@@ -19,7 +19,7 @@ Before running the python scripts make sure that the repo is in your python path
 
 Triplets can be made using script `dataset/prepare_im.py` from a dataset with a Colmap reconstruction available.
 
-You can also download the triplets already extracted for [Phototourism](https://cogsci.dai.fmph.uniba.sk/~kocur/triplets-splg-phototourism.tar.gz) and [Aachen](https://cogsci.dai.fmph.uniba.sk/~kocur/triplets-splg-aachen.tar.gz).
+You can also download the triplets already extracted for [Phototourism and Aachen](https://doi.org/10.5281/zenodo.16603086).
 
 ## Evaluation
 
