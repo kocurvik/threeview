@@ -28,4 +28,13 @@ To perform the evaluation on real data run for each scene:
 python eval.py -nw 64 triplets-features_superpoint_noresize_2048-LG /path/to/scene_folder_with_triplets
 ```
 
-
+## Citation
+```
+@inproceedings{tzamos2025practical,
+  title={Practical solutions to the relative pose of three calibrated cameras},
+  author={Tzamos, Charalambos and Kocur, Viktor and Ding, Yaqing and Barath, Daniel and Haladov{\'a}, Zuzana Berger and Sattler, Torsten and Kukelova, Zuzana},
+  booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference},
+  pages={21913--21923},
+  year={2025}
+}
+```
